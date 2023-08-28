@@ -26,8 +26,8 @@ func NewRouter(
 		CookiePath:     "/",
 		CookieDomain:   os.Getenv("API_DOMAIN"),
 		CookieHTTPOnly: true,
-		CookieSameSite: http.SameSiteNoneMode,
-		// CookieSameSite: http.SameSiteDefaultMode, //PostMan使用する時に使用
+		// CookieSameSite: http.SameSiteNoneMode,
+		CookieSameSite: http.SameSiteDefaultMode, //PostMan使用する時に使用
 		//CookieMaxAge:   60,
 	}))
 	e.POST("/signup", uc.SignUp)
