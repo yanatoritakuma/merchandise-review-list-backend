@@ -28,7 +28,7 @@ func NewRouter(
 		CookieHTTPOnly: true,
 		CookieSameSite: http.SameSiteNoneMode,
 		// CookieSameSite: http.SameSiteDefaultMode, //PostMan使用する時に使用
-		CookieMaxAge: 60,
+		// CookieMaxAge: 60,
 	}))
 	e.POST("/signup", uc.SignUp)
 	e.POST("/login", uc.LogIn)
