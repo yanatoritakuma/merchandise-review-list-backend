@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"merchandise-review-list-backend/model"
 	"merchandise-review-list-backend/usecase"
 	"net/http"
@@ -91,6 +92,7 @@ func (uc *userController) GetLoggedInUser(c echo.Context) error {
 		return c.JSON(http.StatusUnauthorized, "unauthorized")
 	}
 
+	fmt.Print("cookie", cookie)
 	return c.JSON(http.StatusOK, userRes)
 }
 
