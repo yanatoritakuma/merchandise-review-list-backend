@@ -7,6 +7,8 @@ import (
 	"merchandise-review-list-backend/router"
 	"merchandise-review-list-backend/usecase"
 	"merchandise-review-list-backend/validator"
+
+	"github.com/labstack/gommon/log"
 )
 
 func main() {
@@ -17,5 +19,6 @@ func main() {
 	userController := controller.NewUserController(userUsecase)
 
 	e := router.NewRouter(userController)
+	e.Logger.SetLevel(log.INFO)
 	e.Logger.Fatal(e.Start(":8080"))
 }
