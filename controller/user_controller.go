@@ -91,8 +91,6 @@ func (uc *userController) GetLoggedInUser(c echo.Context) error {
 		return c.JSON(http.StatusUnauthorized, "unauthorized")
 	}
 
-	// fmt.Print("cookie", cookie)
-	c.Echo().Logger.Info(cookie)
 	return c.JSON(http.StatusOK, userRes)
 }
 
