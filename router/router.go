@@ -30,6 +30,13 @@ func NewRouter(
 		// CookieSameSite: http.SameSiteDefaultMode, //PostMan使用する時に使用
 		// CookieMaxAge: 60,
 	}))
+	e.Use((middleware.JWTWithConfig(middleware.JWTConfig{
+		SigningKey:    []byte(os.Getenv("SECRET")), // JWTの署名鍵を指定
+		SigningMethod: "HS256",                     // 使用する署名アルゴリズムを指定
+		ContextKey:    "token",                     // ユーザー情報を格納するコンテキストキーを指定
+		TokenLookup:   "cookie:token",              // JWTを探す場所を指定
+	})))
+
 	e.POST("/signup", uc.SignUp)
 	e.POST("/login", uc.LogIn)
 	e.POST("/logout", uc.LogOut)
