@@ -45,7 +45,7 @@ func NewRouter(
 	u.Use((middleware.JWTWithConfig(middleware.JWTConfig{
 		SigningKey:    []byte(os.Getenv("SECRET")), // JWTの署名鍵を指定
 		SigningMethod: "HS256",                     // 使用する署名アルゴリズムを指定
-		ContextKey:    "token",                     // ユーザー情報を格納するコンテキストキーを指定
+		ContextKey:    "user",                      // ユーザー情報を格納するコンテキストキーを指定
 		TokenLookup:   "cookie:token",              // JWTを探す場所を指定
 	})))
 
