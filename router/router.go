@@ -31,6 +31,16 @@ func NewRouter(
 		// CookieMaxAge: 60,
 	}))
 
+	// もう一つのドメインに対しても同様の設定を行う
+	e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
+		CookiePath:     "/",
+		CookieDomain:   os.Getenv("FE_SC_URL"), // 2つ目のドメイン
+		CookieHTTPOnly: true,
+		CookieSameSite: http.SameSiteNoneMode,
+		// CookieSameSite: http.SameSiteDefaultMode, // PostMan使用する時に使用
+		// CookieMaxAge: 60,
+	}))
+
 	e.POST("/signup", uc.SignUp)
 	e.POST("/login", uc.LogIn)
 	e.POST("/logout", uc.LogOut)
