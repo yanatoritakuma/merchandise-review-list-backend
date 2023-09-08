@@ -16,7 +16,7 @@ func NewRouter(
 ) *echo.Echo {
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://localhost:3000", os.Getenv("FE_URL"), os.Getenv("FE_SC_URL")},
+		AllowOrigins: []string{"http://localhost:3000", os.Getenv("FE_URL")},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept,
 			echo.HeaderAccessControlAllowHeaders, echo.HeaderXCSRFToken},
 		AllowMethods:     []string{"GET", "PUT", "POST", "DELETE"},
@@ -25,14 +25,6 @@ func NewRouter(
 	e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
 		CookiePath:     "/",
 		CookieDomain:   os.Getenv("API_DOMAIN"),
-		CookieHTTPOnly: true,
-		CookieSameSite: http.SameSiteNoneMode,
-		// CookieSameSite: http.SameSiteDefaultMode, //PostMan使用する時に使用
-		// CookieMaxAge: 60,
-	}))
-	e.Use(middleware.CSRFWithConfig(middleware.CSRFConfig{
-		CookiePath:     "/",
-		CookieDomain:   os.Getenv("FE_SC_URL"),
 		CookieHTTPOnly: true,
 		CookieSameSite: http.SameSiteNoneMode,
 		// CookieSameSite: http.SameSiteDefaultMode, //PostMan使用する時に使用

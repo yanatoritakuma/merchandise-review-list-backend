@@ -56,8 +56,7 @@ func (uc *userController) LogIn(c echo.Context) error {
 	cookie.Value = tokenString
 	cookie.Expires = time.Now().Add(24 * time.Hour)
 	cookie.Path = "/"
-	// cookie.Domain = os.Getenv("API_DOMAIN")
-	cookie.Domain = os.Getenv("FE_SC_URL")
+	cookie.Domain = os.Getenv("API_DOMAIN")
 	cookie.Secure = true //PostMan使用する時コメントアウト
 	cookie.HttpOnly = true
 	cookie.SameSite = http.SameSiteNoneMode
