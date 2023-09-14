@@ -13,6 +13,7 @@ import (
 
 func NewRouter(
 	uc controller.IUserController,
+	pc controller.IProductController,
 ) *echo.Echo {
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
@@ -47,12 +48,14 @@ func NewRouter(
 	u.PUT("", uc.UpdateUser)
 	u.DELETE("/:userId", uc.DeleteUser)
 
-	p := e.Group("/posts")
-	// JWTが必須なエンドポイント
+	p := e.Group("/product")
+
 	p.Use(echojwt.WithConfig(echojwt.Config{
 		SigningKey:  []byte(os.Getenv("SECRET")),
 		TokenLookup: "cookie:token",
 	}))
+	// JWTが必須なエンドポイント
+	p.POST("", pc.CreateProduct)
 
 	return e
 }
