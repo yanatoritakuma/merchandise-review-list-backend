@@ -7,6 +7,7 @@ import (
 
 type IProductUsecase interface {
 	CreateProduct(product model.Product) (model.ProductResponse, error)
+	DeleteProduct(userId uint, productId uint) error
 	GetMyProducts(userId uint, page int, pageSize int) ([]model.ProductResponse, int, error)
 }
 
@@ -34,6 +35,13 @@ func (pu *productUsecase) CreateProduct(product model.Product) (model.ProductRes
 		CreatedAt:   product.CreatedAt,
 	}
 	return resProduct, nil
+}
+
+func (pu *productUsecase) DeleteProduct(userId uint, productId uint) error {
+	if err := pu.pr.DeleteProduct(userId, productId); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (pu *productUsecase) GetMyProducts(userId uint, page int, pageSize int) ([]model.ProductResponse, int, error) {

@@ -12,6 +12,7 @@ import (
 
 type IProductController interface {
 	CreateProduct(c echo.Context) error
+	DeleteProduct(c echo.Context) error
 	GetMyProducts(c echo.Context) error
 }
 
@@ -38,6 +39,20 @@ func (pc *productController) CreateProduct(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusCreated, productRes)
+}
+
+func (pc *productController) DeleteProduct(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userId := claims["user_id"]
+	id := c.Param("productId")
+	productId, _ := strconv.Atoi(id)
+
+	err := pc.pu.DeleteProduct(uint(userId.(float64)), uint(productId))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.NoContent(http.StatusNoContent)
 }
 
 func (pc *productController) GetMyProducts(c echo.Context) error {

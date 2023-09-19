@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"merchandise-review-list-backend/model"
 
 	"gorm.io/gorm"
@@ -8,6 +9,7 @@ import (
 
 type IProductRepository interface {
 	CreateProduct(product *model.Product) error
+	DeleteProduct(userId uint, productId uint) error
 	GetMyProducts(product *[]model.Product, userId uint, page int, pageSize int) (int, error)
 }
 
@@ -22,6 +24,17 @@ func NewProductRepository(db *gorm.DB) IProductRepository {
 func (pr *productRepository) CreateProduct(product *model.Product) error {
 	if err := pr.db.Create(product).Error; err != nil {
 		return err
+	}
+	return nil
+}
+
+func (pr *productRepository) DeleteProduct(userId uint, productId uint) error {
+	result := pr.db.Where("id=? AND user_id=?", productId, userId).Delete(&model.Product{})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected < 1 {
+		return fmt.Errorf("object does not exist")
 	}
 	return nil
 }
