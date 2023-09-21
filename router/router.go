@@ -14,6 +14,7 @@ import (
 func NewRouter(
 	uc controller.IUserController,
 	pc controller.IProductController,
+	rc controller.IReviewPostController,
 ) *echo.Echo {
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
@@ -58,6 +59,14 @@ func NewRouter(
 	p.POST("", pc.CreateProduct)
 	p.GET("/userProducts", pc.GetMyProducts)
 	p.DELETE("/:productId", pc.DeleteProduct)
+
+	r := e.Group("/reviewPosts")
+	// JWTが必須なエンドポイント
+	r.Use(echojwt.WithConfig(echojwt.Config{
+		SigningKey:  []byte(os.Getenv("SECRET")),
+		TokenLookup: "cookie:token",
+	}))
+	r.POST("", rc.CreateReviewPost)
 
 	return e
 }
