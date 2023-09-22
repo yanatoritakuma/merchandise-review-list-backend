@@ -4,6 +4,7 @@ import (
 	"merchandise-review-list-backend/model"
 	"merchandise-review-list-backend/usecase"
 	"net/http"
+	"strconv"
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
@@ -11,6 +12,7 @@ import (
 
 type IReviewPostController interface {
 	CreateReviewPost(c echo.Context) error
+	GetReviewPostsByIds(c echo.Context) error
 }
 
 type reviewPostController struct {
@@ -21,7 +23,7 @@ func NewReviewPostController(ru usecase.IReviewPostUsecase) IReviewPostControlle
 	return &reviewPostController{ru}
 }
 
-func (pc *reviewPostController) CreateReviewPost(c echo.Context) error {
+func (rc *reviewPostController) CreateReviewPost(c echo.Context) error {
 	user := c.Get("user").(*jwt.Token)
 	claims := user.Claims.(jwt.MapClaims)
 	userId := claims["user_id"]
@@ -31,9 +33,29 @@ func (pc *reviewPostController) CreateReviewPost(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 	reviewPost.UserId = uint(userId.(float64))
-	reviewPostRes, err := pc.ru.CreateReviewPost(reviewPost)
+	reviewPostRes, err := rc.ru.CreateReviewPost(reviewPost)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusCreated, reviewPostRes)
+}
+
+func (rc *reviewPostController) GetReviewPostsByIds(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userId := claims["user_id"]
+	page, _ := strconv.Atoi(c.QueryParam("page"))
+	pageSize, _ := strconv.Atoi(c.QueryParam("pageSize"))
+
+	reviewPostsRes, totalPageCount, err := rc.ru.GetReviewPostsByIds(uint(userId.(float64)), page, pageSize)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	response := map[string]interface{}{
+		"totalPageCount": totalPageCount,
+		"reviewPosts":    reviewPostsRes,
+	}
+
+	return c.JSON(http.StatusOK, response)
 }
