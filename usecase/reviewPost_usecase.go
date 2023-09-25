@@ -8,6 +8,7 @@ import (
 
 type IReviewPostUsecase interface {
 	CreateReviewPost(reviewPost model.ReviewPost) (model.ReviewPostResponse, error)
+	UpdateReviewPost(reviewPost model.ReviewPost, userId uint, postId uint) (model.ReviewPostResponse, error)
 	GetReviewPostsByIds(userId uint, page int, pageSize int) ([]model.ReviewPostResponse, int, error)
 }
 
@@ -28,6 +29,29 @@ func (ru *reviewPostUsecase) CreateReviewPost(reviewPost model.ReviewPost) (mode
 		return model.ReviewPostResponse{}, err
 	}
 	if err := ru.rr.CreateReviewPost(&reviewPost); err != nil {
+		return model.ReviewPostResponse{}, err
+	}
+	resReviewPost := model.ReviewPostResponse{
+		ID:        reviewPost.ID,
+		Title:     reviewPost.Title,
+		Text:      reviewPost.Text,
+		Image:     reviewPost.Image,
+		CreatedAt: reviewPost.CreatedAt,
+		User: model.ReviewPostUserResponse{
+			ID:    reviewPost.User.ID,
+			Name:  reviewPost.User.Name,
+			Image: reviewPost.User.Image,
+		},
+		UserId: reviewPost.UserId,
+	}
+	return resReviewPost, nil
+}
+
+func (ru *reviewPostUsecase) UpdateReviewPost(reviewPost model.ReviewPost, userId uint, postId uint) (model.ReviewPostResponse, error) {
+	if err := ru.rv.ReviewPostValidator(reviewPost); err != nil {
+		return model.ReviewPostResponse{}, err
+	}
+	if err := ru.rr.UpdateReviewPost(&reviewPost, userId, postId); err != nil {
 		return model.ReviewPostResponse{}, err
 	}
 	resReviewPost := model.ReviewPostResponse{

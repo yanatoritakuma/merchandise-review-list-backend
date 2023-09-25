@@ -12,6 +12,7 @@ import (
 
 type IReviewPostController interface {
 	CreateReviewPost(c echo.Context) error
+	UpdateReviewPost(c echo.Context) error
 	GetReviewPostsByIds(c echo.Context) error
 }
 
@@ -34,6 +35,24 @@ func (rc *reviewPostController) CreateReviewPost(c echo.Context) error {
 	}
 	reviewPost.UserId = uint(userId.(float64))
 	reviewPostRes, err := rc.ru.CreateReviewPost(reviewPost)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusCreated, reviewPostRes)
+}
+
+func (rc *reviewPostController) UpdateReviewPost(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userId := claims["user_id"]
+	id := c.Param("postId")
+	postId, _ := strconv.Atoi(id)
+
+	reviewPost := model.ReviewPost{}
+	if err := c.Bind(&reviewPost); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+	reviewPostRes, err := rc.ru.UpdateReviewPost(reviewPost, uint(userId.(float64)), uint(postId))
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}

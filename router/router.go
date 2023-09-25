@@ -67,6 +67,7 @@ func NewRouter(
 		TokenLookup: "cookie:token",
 	}))
 	r.POST("", rc.CreateReviewPost)
+	r.PUT("/:postId", rc.UpdateReviewPost)
 	r.GET("/userReviewPosts", rc.GetReviewPostsByIds)
 
 	return e

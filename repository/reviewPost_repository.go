@@ -1,13 +1,17 @@
 package repository
 
 import (
+	"fmt"
 	"merchandise-review-list-backend/model"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type IReviewPostRepository interface {
 	CreateReviewPost(reviewPost *model.ReviewPost) error
+	UpdateReviewPost(reviewPost *model.ReviewPost, userId uint, postId uint) error
+
 	GetMyReviewPosts(reviewPost *[]model.ReviewPost, userId uint, page int, pageSize int) (int, error)
 }
 
@@ -22,6 +26,22 @@ func NewPostRepository(db *gorm.DB) IReviewPostRepository {
 func (pr *reviewPostRepository) CreateReviewPost(reviewPost *model.ReviewPost) error {
 	if err := pr.db.Create(reviewPost).Error; err != nil {
 		return err
+	}
+	return nil
+}
+
+func (pr *reviewPostRepository) UpdateReviewPost(reviewPost *model.ReviewPost, userId uint, postId uint) error {
+	result := pr.db.Model(reviewPost).Clauses(clause.Returning{}).Where("id=? AND user_id=?", postId, userId).Updates(map[string]interface{}{
+		"title":  reviewPost.Title,
+		"text":   reviewPost.Text,
+		"image":  reviewPost.Image,
+		"review": reviewPost.Review,
+	})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected < 1 {
+		return fmt.Errorf("object does not exist")
 	}
 	return nil
 }
