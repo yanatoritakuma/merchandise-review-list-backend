@@ -13,7 +13,8 @@ import (
 type IReviewPostController interface {
 	CreateReviewPost(c echo.Context) error
 	UpdateReviewPost(c echo.Context) error
-	GetReviewPostsByIds(c echo.Context) error
+	GetMyReviewPosts(c echo.Context) error
+	GetReviewPostById(c echo.Context) error
 }
 
 type reviewPostController struct {
@@ -59,14 +60,14 @@ func (rc *reviewPostController) UpdateReviewPost(c echo.Context) error {
 	return c.JSON(http.StatusCreated, reviewPostRes)
 }
 
-func (rc *reviewPostController) GetReviewPostsByIds(c echo.Context) error {
+func (rc *reviewPostController) GetMyReviewPosts(c echo.Context) error {
 	user := c.Get("user").(*jwt.Token)
 	claims := user.Claims.(jwt.MapClaims)
 	userId := claims["user_id"]
 	page, _ := strconv.Atoi(c.QueryParam("page"))
 	pageSize, _ := strconv.Atoi(c.QueryParam("pageSize"))
 
-	reviewPostsRes, totalPageCount, err := rc.ru.GetReviewPostsByIds(uint(userId.(float64)), page, pageSize)
+	reviewPostsRes, totalPageCount, err := rc.ru.GetMyReviewPosts(uint(userId.(float64)), page, pageSize)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -77,4 +78,14 @@ func (rc *reviewPostController) GetReviewPostsByIds(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, response)
+}
+
+func (rc *reviewPostController) GetReviewPostById(c echo.Context) error {
+	id := c.Param("postId")
+	postId, _ := strconv.Atoi(id)
+	reviewPostRes, err := rc.ru.GetReviewPostById(uint(postId))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, reviewPostRes)
 }

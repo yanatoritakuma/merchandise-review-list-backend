@@ -9,7 +9,8 @@ import (
 type IReviewPostUsecase interface {
 	CreateReviewPost(reviewPost model.ReviewPost) (model.ReviewPostResponse, error)
 	UpdateReviewPost(reviewPost model.ReviewPost, userId uint, postId uint) (model.ReviewPostResponse, error)
-	GetReviewPostsByIds(userId uint, page int, pageSize int) ([]model.ReviewPostResponse, int, error)
+	GetMyReviewPosts(userId uint, page int, pageSize int) ([]model.ReviewPostResponse, int, error)
+	GetReviewPostById(postId uint) (model.ReviewPostResponse, error)
 }
 
 type reviewPostUsecase struct {
@@ -70,7 +71,7 @@ func (ru *reviewPostUsecase) UpdateReviewPost(reviewPost model.ReviewPost, userI
 	return resReviewPost, nil
 }
 
-func (ru *reviewPostUsecase) GetReviewPostsByIds(userId uint, page int, pageSize int) ([]model.ReviewPostResponse, int, error) {
+func (ru *reviewPostUsecase) GetMyReviewPosts(userId uint, page int, pageSize int) ([]model.ReviewPostResponse, int, error) {
 	reviewPosts := []model.ReviewPost{}
 	totalCount, err := ru.rr.GetMyReviewPosts(&reviewPosts, userId, page, pageSize)
 	if err != nil {
@@ -97,4 +98,30 @@ func (ru *reviewPostUsecase) GetReviewPostsByIds(userId uint, page int, pageSize
 		resReviewPosts = append(resReviewPosts, r)
 	}
 	return resReviewPosts, totalCount, nil
+}
+
+func (ru *reviewPostUsecase) GetReviewPostById(postId uint) (model.ReviewPostResponse, error) {
+	reviewPost := model.ReviewPost{}
+	if err := ru.rr.GetReviewPostById(&reviewPost, postId); err != nil {
+		return model.ReviewPostResponse{}, err
+	}
+	user, err := ru.rr.GetUserById(reviewPost.UserId)
+	if err != nil {
+		return model.ReviewPostResponse{}, err
+	}
+	resReviewPost := model.ReviewPostResponse{
+		ID:        reviewPost.ID,
+		Title:     reviewPost.Title,
+		Text:      reviewPost.Text,
+		Image:     reviewPost.Image,
+		Review:    reviewPost.Review,
+		CreatedAt: reviewPost.CreatedAt,
+		User: model.ReviewPostUserResponse{
+			ID:    user.ID,
+			Name:  user.Name,
+			Image: user.Image,
+		},
+		UserId: reviewPost.UserId,
+	}
+	return resReviewPost, nil
 }

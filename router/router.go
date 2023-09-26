@@ -68,7 +68,9 @@ func NewRouter(
 	}))
 	r.POST("", rc.CreateReviewPost)
 	r.PUT("/:postId", rc.UpdateReviewPost)
-	r.GET("/userReviewPosts", rc.GetReviewPostsByIds)
+	r.GET("/userReviewPosts", rc.GetMyReviewPosts)
+	// JWTが必須でないエンドポイント
+	e.GET("reviewPosts/postId/:postId", rc.GetReviewPostById)
 
 	return e
 }
