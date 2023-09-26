@@ -11,7 +11,7 @@ import (
 type IReviewPostRepository interface {
 	CreateReviewPost(reviewPost *model.ReviewPost) error
 	UpdateReviewPost(reviewPost *model.ReviewPost, userId uint, postId uint) error
-
+	DeleteReviewPost(userId uint, postId uint) error
 	GetMyReviewPosts(reviewPost *[]model.ReviewPost, userId uint, page int, pageSize int) (int, error)
 	GetReviewPostById(reviewPost *model.ReviewPost, postId uint) error
 	GetUserById(id uint) (*model.User, error)
@@ -76,4 +76,15 @@ func (rr *reviewPostRepository) GetUserById(id uint) (*model.User, error) {
 		return nil, result.Error
 	}
 	return user, nil
+}
+
+func (rr *reviewPostRepository) DeleteReviewPost(userId uint, postId uint) error {
+	result := rr.db.Where("id=? AND user_id=?", postId, userId).Delete(&model.ReviewPost{})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected < 1 {
+		return fmt.Errorf("object does not exist")
+	}
+	return nil
 }

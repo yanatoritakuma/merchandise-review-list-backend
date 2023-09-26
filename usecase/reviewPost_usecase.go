@@ -9,6 +9,7 @@ import (
 type IReviewPostUsecase interface {
 	CreateReviewPost(reviewPost model.ReviewPost) (model.ReviewPostResponse, error)
 	UpdateReviewPost(reviewPost model.ReviewPost, userId uint, postId uint) (model.ReviewPostResponse, error)
+	DeleteReviewPost(userId uint, postId uint) error
 	GetMyReviewPosts(userId uint, page int, pageSize int) ([]model.ReviewPostResponse, int, error)
 	GetReviewPostById(postId uint) (model.ReviewPostResponse, error)
 }
@@ -124,4 +125,11 @@ func (ru *reviewPostUsecase) GetReviewPostById(postId uint) (model.ReviewPostRes
 		UserId: reviewPost.UserId,
 	}
 	return resReviewPost, nil
+}
+
+func (ru *reviewPostUsecase) DeleteReviewPost(userId uint, postId uint) error {
+	if err := ru.rr.DeleteReviewPost(userId, postId); err != nil {
+		return err
+	}
+	return nil
 }

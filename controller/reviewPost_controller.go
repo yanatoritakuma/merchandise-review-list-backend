@@ -13,6 +13,7 @@ import (
 type IReviewPostController interface {
 	CreateReviewPost(c echo.Context) error
 	UpdateReviewPost(c echo.Context) error
+	DeleteReviewPost(c echo.Context) error
 	GetMyReviewPosts(c echo.Context) error
 	GetReviewPostById(c echo.Context) error
 }
@@ -88,4 +89,18 @@ func (rc *reviewPostController) GetReviewPostById(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusOK, reviewPostRes)
+}
+
+func (rc *reviewPostController) DeleteReviewPost(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userId := claims["user_id"]
+	id := c.Param("postId")
+	postId, _ := strconv.Atoi(id)
+
+	err := rc.ru.DeleteReviewPost(uint(userId.(float64)), uint(postId))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.NoContent(http.StatusNoContent)
 }
