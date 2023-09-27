@@ -34,10 +34,11 @@ func (rr *reviewPostRepository) CreateReviewPost(reviewPost *model.ReviewPost) e
 
 func (rr *reviewPostRepository) UpdateReviewPost(reviewPost *model.ReviewPost, userId uint, postId uint) error {
 	result := rr.db.Model(reviewPost).Clauses(clause.Returning{}).Where("id=? AND user_id=?", postId, userId).Updates(map[string]interface{}{
-		"title":  reviewPost.Title,
-		"text":   reviewPost.Text,
-		"image":  reviewPost.Image,
-		"review": reviewPost.Review,
+		"title":    reviewPost.Title,
+		"text":     reviewPost.Text,
+		"image":    reviewPost.Image,
+		"review":   reviewPost.Review,
+		"category": reviewPost.Category,
 	})
 	if result.Error != nil {
 		return result.Error

@@ -38,6 +38,7 @@ func (ru *reviewPostUsecase) CreateReviewPost(reviewPost model.ReviewPost) (mode
 		Title:     reviewPost.Title,
 		Text:      reviewPost.Text,
 		Image:     reviewPost.Image,
+		Category:  reviewPost.Category,
 		CreatedAt: reviewPost.CreatedAt,
 		User: model.ReviewPostUserResponse{
 			ID:    reviewPost.User.ID,
@@ -61,6 +62,8 @@ func (ru *reviewPostUsecase) UpdateReviewPost(reviewPost model.ReviewPost, userI
 		Title:     reviewPost.Title,
 		Text:      reviewPost.Text,
 		Image:     reviewPost.Image,
+		Review:    reviewPost.Review,
+		Category:  reviewPost.Category,
 		CreatedAt: reviewPost.CreatedAt,
 		User: model.ReviewPostUserResponse{
 			ID:    reviewPost.User.ID,
@@ -70,6 +73,13 @@ func (ru *reviewPostUsecase) UpdateReviewPost(reviewPost model.ReviewPost, userI
 		UserId: reviewPost.UserId,
 	}
 	return resReviewPost, nil
+}
+
+func (ru *reviewPostUsecase) DeleteReviewPost(userId uint, postId uint) error {
+	if err := ru.rr.DeleteReviewPost(userId, postId); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (ru *reviewPostUsecase) GetMyReviewPosts(userId uint, page int, pageSize int) ([]model.ReviewPostResponse, int, error) {
@@ -88,6 +98,7 @@ func (ru *reviewPostUsecase) GetMyReviewPosts(userId uint, page int, pageSize in
 			Text:      v.Text,
 			Image:     v.Image,
 			Review:    v.Review,
+			Category:  v.Category,
 			CreatedAt: v.CreatedAt,
 			User: model.ReviewPostUserResponse{
 				ID:    v.User.ID,
@@ -116,6 +127,7 @@ func (ru *reviewPostUsecase) GetReviewPostById(postId uint) (model.ReviewPostRes
 		Text:      reviewPost.Text,
 		Image:     reviewPost.Image,
 		Review:    reviewPost.Review,
+		Category:  reviewPost.Category,
 		CreatedAt: reviewPost.CreatedAt,
 		User: model.ReviewPostUserResponse{
 			ID:    user.ID,
@@ -125,11 +137,4 @@ func (ru *reviewPostUsecase) GetReviewPostById(postId uint) (model.ReviewPostRes
 		UserId: reviewPost.UserId,
 	}
 	return resReviewPost, nil
-}
-
-func (ru *reviewPostUsecase) DeleteReviewPost(userId uint, postId uint) error {
-	if err := ru.rr.DeleteReviewPost(userId, postId); err != nil {
-		return err
-	}
-	return nil
 }
