@@ -15,6 +15,7 @@ type IReviewPostRepository interface {
 	GetMyReviewPosts(reviewPost *[]model.ReviewPost, userId uint, page int, pageSize int) (int, error)
 	GetReviewPostById(reviewPost *model.ReviewPost, postId uint) error
 	GetUserById(id uint) (*model.User, error)
+	GetReviewPostLists(reviewPost *[]model.ReviewPost, category string, page int, pageSize int) (int, error)
 }
 
 type reviewPostRepository struct {
@@ -88,4 +89,33 @@ func (rr *reviewPostRepository) DeleteReviewPost(userId uint, postId uint) error
 		return fmt.Errorf("object does not exist")
 	}
 	return nil
+}
+
+func (rr *reviewPostRepository) GetReviewPostLists(reviewPost *[]model.ReviewPost, category string, page int, pageSize int) (int, error) {
+	offset := (page - 1) * pageSize
+	var totalCount int64
+
+	// categoryが空文字列の場合は条件を無視して全てのレコードをカウント
+	if category == "all" {
+		if err := rr.db.Model(&model.ReviewPost{}).Count(&totalCount).Error; err != nil {
+			return 0, err
+		}
+	} else {
+		if err := rr.db.Model(&model.ReviewPost{}).Where("category = ?", category).Count(&totalCount).Error; err != nil {
+			return 0, err
+		}
+	}
+
+	// categoryが空文字列の場合は条件を無視して全てのレコードを取得
+	if category == "all" {
+		if err := rr.db.Order("created_at DESC").Offset(offset).Limit(pageSize).Find(reviewPost).Error; err != nil {
+			return 0, err
+		}
+	} else {
+		if err := rr.db.Where("category = ?", category).Order("created_at DESC").Offset(offset).Limit(pageSize).Find(reviewPost).Error; err != nil {
+			return 0, err
+		}
+	}
+
+	return int(totalCount), nil
 }

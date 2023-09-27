@@ -12,6 +12,7 @@ type IReviewPostUsecase interface {
 	DeleteReviewPost(userId uint, postId uint) error
 	GetMyReviewPosts(userId uint, page int, pageSize int) ([]model.ReviewPostResponse, int, error)
 	GetReviewPostById(postId uint) (model.ReviewPostResponse, error)
+	GetReviewPostLists(category string, page int, pageSize int, userId uint) ([]model.ReviewPostResponse, int, error)
 }
 
 type reviewPostUsecase struct {
@@ -137,4 +138,40 @@ func (ru *reviewPostUsecase) GetReviewPostById(postId uint) (model.ReviewPostRes
 		UserId: reviewPost.UserId,
 	}
 	return resReviewPost, nil
+}
+
+func (ru *reviewPostUsecase) GetReviewPostLists(category string, page int, pageSize int, userId uint) ([]model.ReviewPostResponse, int, error) {
+	reviewPosts := []model.ReviewPost{}
+
+	totalCount, err := ru.rr.GetReviewPostLists(&reviewPosts, category, page, pageSize)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	resReviewPosts := []model.ReviewPostResponse{}
+	for _, v := range reviewPosts {
+		user, err := ru.rr.GetUserById(v.UserId)
+		if err != nil {
+			return nil, 0, err
+		}
+
+		r := model.ReviewPostResponse{
+			ID:        v.ID,
+			Title:     v.Title,
+			Text:      v.Text,
+			Image:     v.Image,
+			Review:    v.Review,
+			Category:  v.Category,
+			CreatedAt: v.CreatedAt,
+			User: model.ReviewPostUserResponse{
+				ID:    user.ID,
+				Name:  user.Name,
+				Image: user.Image,
+			},
+			UserId: v.UserId,
+		}
+
+		resReviewPosts = append(resReviewPosts, r)
+	}
+	return resReviewPosts, totalCount, nil
 }
