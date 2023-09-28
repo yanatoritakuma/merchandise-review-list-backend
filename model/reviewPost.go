@@ -25,8 +25,8 @@ type ReviewPostResponse struct {
 	CreatedAt time.Time              `json:"created_at"`
 	User      ReviewPostUserResponse `json:"reviewPostUserResponse"`
 	UserId    uint                   `json:"user_id" gorm:"not null"`
-	// LikeCount    uint             `json:"like_count"`
-	// LikeId       uint             `json:"like_id"`
+	LikeCount uint                   `json:"like_count"`
+	LikeId    uint                   `json:"like_id"`
 	// CommentCount uint             `json:"commentCount"`
 }
 

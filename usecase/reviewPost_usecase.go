@@ -93,6 +93,20 @@ func (ru *reviewPostUsecase) GetMyReviewPosts(userId uint, page int, pageSize in
 	resReviewPosts := []model.ReviewPostResponse{}
 	for _, v := range reviewPosts {
 
+		likes := []model.Like{}
+		err = ru.rr.GetLikesByPostId(&likes, v.ID)
+		if err != nil {
+			return nil, 0, err
+		}
+
+		likeCount := uint(len(likes))
+		likeId := uint(0)
+		for _, like := range likes {
+			if like.UserId == userId {
+				likeId = uint(like.ID)
+			}
+		}
+
 		r := model.ReviewPostResponse{
 			ID:        v.ID,
 			Title:     v.Title,
@@ -106,7 +120,9 @@ func (ru *reviewPostUsecase) GetMyReviewPosts(userId uint, page int, pageSize in
 				Name:  v.User.Name,
 				Image: v.User.Image,
 			},
-			UserId: v.UserId,
+			UserId:    v.UserId,
+			LikeCount: likeCount,
+			LikeId:    likeId,
 		}
 		resReviewPosts = append(resReviewPosts, r)
 	}
@@ -155,6 +171,20 @@ func (ru *reviewPostUsecase) GetReviewPostLists(category string, page int, pageS
 			return nil, 0, err
 		}
 
+		likes := []model.Like{}
+		err = ru.rr.GetLikesByPostId(&likes, v.ID)
+		if err != nil {
+			return nil, 0, err
+		}
+
+		likeCount := uint(len(likes))
+		likeId := uint(0)
+		for _, like := range likes {
+			if like.UserId == userId {
+				likeId = uint(like.ID)
+			}
+		}
+
 		r := model.ReviewPostResponse{
 			ID:        v.ID,
 			Title:     v.Title,
@@ -168,7 +198,9 @@ func (ru *reviewPostUsecase) GetReviewPostLists(category string, page int, pageS
 				Name:  user.Name,
 				Image: user.Image,
 			},
-			UserId: v.UserId,
+			UserId:    v.UserId,
+			LikeCount: likeCount,
+			LikeId:    likeId,
 		}
 
 		resReviewPosts = append(resReviewPosts, r)

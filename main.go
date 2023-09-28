@@ -25,6 +25,10 @@ func main() {
 	reviewPostUsecase := usecase.NewReviewPostUsecase(reviewPostRepository, reviewPostValidator)
 	reviewPostController := controller.NewReviewPostController(reviewPostUsecase)
 
-	e := router.NewRouter(userController, productController, reviewPostController)
+	likeRepositor := repository.NewLikeRepository(db)
+	likeUsecase := usecase.NewLikeUsecase(likeRepositor)
+	likeController := controller.NewLikeController(likeUsecase)
+
+	e := router.NewRouter(userController, productController, reviewPostController, likeController)
 	e.Logger.Fatal(e.Start(":8080"))
 }
