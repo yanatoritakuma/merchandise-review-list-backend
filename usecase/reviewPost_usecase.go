@@ -13,18 +13,21 @@ type IReviewPostUsecase interface {
 	GetMyReviewPosts(userId uint, page int, pageSize int) ([]model.ReviewPostResponse, int, error)
 	GetReviewPostById(postId uint) (model.ReviewPostResponse, error)
 	GetReviewPostLists(category string, page int, pageSize int, userId uint) ([]model.ReviewPostResponse, int, error)
+	GetMyLikes(userId uint, page int, pageSize int) ([]model.ReviewPostResponse, int, error)
 }
 
 type reviewPostUsecase struct {
 	rr repository.IReviewPostRepository
 	rv validator.IReviewPostValidator
+	lr repository.ILikeRepository
 }
 
 func NewReviewPostUsecase(
 	rr repository.IReviewPostRepository,
 	rv validator.IReviewPostValidator,
+	lr repository.ILikeRepository,
 ) IReviewPostUsecase {
-	return &reviewPostUsecase{rr, rv}
+	return &reviewPostUsecase{rr, rv, lr}
 }
 
 func (ru *reviewPostUsecase) CreateReviewPost(reviewPost model.ReviewPost) (model.ReviewPostResponse, error) {
@@ -206,4 +209,59 @@ func (ru *reviewPostUsecase) GetReviewPostLists(category string, page int, pageS
 		resReviewPosts = append(resReviewPosts, r)
 	}
 	return resReviewPosts, totalCount, nil
+}
+
+func (ru *reviewPostUsecase) GetMyLikes(userId uint, page int, pageSize int) ([]model.ReviewPostResponse, int, error) {
+	totalLikeCount, err := ru.lr.GetMyLikeCount(userId)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	postIds, err := ru.lr.GetMyLikePostIdsByUserId(userId, page, pageSize)
+	resLikePosts := []model.ReviewPostResponse{}
+	for _, v := range postIds {
+		likes := []model.Like{}
+		err = ru.rr.GetLikesByPostId(&likes, v)
+		if err != nil {
+			return nil, 0, err
+		}
+
+		likeCount := uint(len(likes))
+		likeId := uint(0)
+		for _, like := range likes {
+			if like.UserId == userId {
+				likeId = uint(like.ID)
+			}
+		}
+
+		post := model.ReviewPost{}
+		if err := ru.rr.GetReviewPostById(&post, v); err != nil {
+			return nil, 0, err
+		}
+
+		user, err := ru.rr.GetUserById(post.UserId)
+		if err != nil {
+			return nil, 0, err
+		}
+
+		p := model.ReviewPostResponse{
+			ID:        post.ID,
+			Title:     post.Title,
+			Text:      post.Text,
+			Image:     post.Image,
+			Review:    post.Review,
+			Category:  post.Category,
+			CreatedAt: post.CreatedAt,
+			User: model.ReviewPostUserResponse{
+				ID:    user.ID,
+				Name:  user.Name,
+				Image: user.Image,
+			},
+			UserId:    post.UserId,
+			LikeCount: likeCount,
+			LikeId:    likeId,
+		}
+		resLikePosts = append(resLikePosts, p)
+	}
+	return resLikePosts, totalLikeCount, nil
 }

@@ -71,6 +71,7 @@ func NewRouter(
 	r.PUT("/:postId", rc.UpdateReviewPost)
 	r.GET("/userReviewPosts", rc.GetMyReviewPosts)
 	r.DELETE("/:postId", rc.DeleteReviewPost)
+	r.GET("/likes", rc.GetMyLikes)
 	// JWTが必須でないエンドポイント
 	e.GET("/reviewPosts/postId/:postId", rc.GetReviewPostById)
 	e.GET("/reviewPosts/lists/:category", rc.GetReviewPostLists)
