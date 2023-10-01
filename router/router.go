@@ -15,6 +15,7 @@ func NewRouter(
 	uc controller.IUserController,
 	pc controller.IProductController,
 	rc controller.IReviewPostController,
+	lc controller.ILikeController,
 ) *echo.Echo {
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
@@ -70,8 +71,19 @@ func NewRouter(
 	r.PUT("/:postId", rc.UpdateReviewPost)
 	r.GET("/userReviewPosts", rc.GetMyReviewPosts)
 	r.DELETE("/:postId", rc.DeleteReviewPost)
+	r.GET("/likes", rc.GetMyLikes)
 	// JWTが必須でないエンドポイント
-	e.GET("reviewPosts/postId/:postId", rc.GetReviewPostById)
+	e.GET("/reviewPosts/postId/:postId", rc.GetReviewPostById)
+	e.GET("/reviewPosts/lists/:category", rc.GetReviewPostLists)
+
+	l := e.Group("/like")
+	// JWTが必須なエンドポイント
+	l.Use(echojwt.WithConfig(echojwt.Config{
+		SigningKey:  []byte(os.Getenv("SECRET")),
+		TokenLookup: "cookie:token",
+	}))
+	l.POST("", lc.CreateLike)
+	l.DELETE("/:likeId", lc.DeleteLike)
 
 	return e
 }

@@ -16,6 +16,8 @@ type IReviewPostController interface {
 	DeleteReviewPost(c echo.Context) error
 	GetMyReviewPosts(c echo.Context) error
 	GetReviewPostById(c echo.Context) error
+	GetReviewPostLists(c echo.Context) error
+	GetMyLikes(c echo.Context) error
 }
 
 type reviewPostController struct {
@@ -103,4 +105,42 @@ func (rc *reviewPostController) DeleteReviewPost(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return c.NoContent(http.StatusNoContent)
+}
+
+func (rc *reviewPostController) GetReviewPostLists(c echo.Context) error {
+	category := c.Param("category")
+	page, _ := strconv.Atoi(c.QueryParam("page"))
+	pageSize, _ := strconv.Atoi(c.QueryParam("pageSize"))
+	userId, _ := strconv.Atoi(c.QueryParam("userId"))
+	reviewPostsRes, totalPageCount, err := rc.ru.GetReviewPostLists(category, page, pageSize, uint(userId))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	response := map[string]interface{}{
+		"totalPageCount": totalPageCount,
+		"reviewPosts":    reviewPostsRes,
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func (rc *reviewPostController) GetMyLikes(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userId := claims["user_id"]
+	page, _ := strconv.Atoi(c.QueryParam("page"))
+	pageSize, _ := strconv.Atoi(c.QueryParam("pageSize"))
+
+	likePostsRes, totalLikeCount, err := rc.ru.GetMyLikes(uint(userId.(float64)), page, pageSize)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	response := map[string]interface{}{
+		"totalPageCount": totalLikeCount,
+		"reviewPosts":    likePostsRes,
+	}
+
+	return c.JSON(http.StatusOK, response)
 }
