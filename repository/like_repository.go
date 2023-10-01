@@ -67,7 +67,7 @@ func (lr *likeRepository) GetMyLikeCount(userId uint) (int, error) {
 func (lr *likeRepository) GetMyLikePostIdsByUserId(userId uint, page int, pageSize int) ([]uint, error) {
 	likes := []model.Like{}
 	offset := (page - 1) * pageSize
-	if err := lr.db.Where("user_id = ?", userId).Order("created_at").Offset(offset).Limit(pageSize).Find(&likes).Error; err != nil {
+	if err := lr.db.Where("user_id = ?", userId).Order("created_at DESC").Offset(offset).Limit(pageSize).Find(&likes).Error; err != nil {
 		return nil, err
 	}
 
