@@ -96,24 +96,26 @@ func (rr *reviewPostRepository) GetReviewPostLists(reviewPost *[]model.ReviewPos
 	offset := (page - 1) * pageSize
 	var totalCount int64
 
-	// categoryが空文字列の場合は条件を無視して全てのレコードをカウント
+	// categoryがallの場合は条件を無視して全てのレコードをカウント
 	if category == "all" {
 		if err := rr.db.Model(&model.ReviewPost{}).Count(&totalCount).Error; err != nil {
 			return 0, err
 		}
 	} else {
-		if err := rr.db.Model(&model.ReviewPost{}).Where("category = ?", category).Count(&totalCount).Error; err != nil {
+		// 部分一致でカテゴリーを検索し、結果の数をカウント
+		if err := rr.db.Model(&model.ReviewPost{}).Where("category LIKE ?", "%"+category+"%").Count(&totalCount).Error; err != nil {
 			return 0, err
 		}
 	}
 
-	// categoryが空文字列の場合は条件を無視して全てのレコードを取得
+	// categoryがallの場合は条件を無視して全てのレコードを取得
 	if category == "all" {
 		if err := rr.db.Order("created_at DESC").Offset(offset).Limit(pageSize).Find(reviewPost).Error; err != nil {
 			return 0, err
 		}
 	} else {
-		if err := rr.db.Where("category = ?", category).Order("created_at DESC").Offset(offset).Limit(pageSize).Find(reviewPost).Error; err != nil {
+		// 部分一致でカテゴリーを検索し、指定されたページとページサイズで結果を取得
+		if err := rr.db.Where("category LIKE ?", "%"+category+"%").Order("created_at DESC").Offset(offset).Limit(pageSize).Find(reviewPost).Error; err != nil {
 			return 0, err
 		}
 	}
