@@ -44,10 +44,10 @@ func (lc *likeController) DeleteLike(c echo.Context) error {
 	user := c.Get("user").(*jwt.Token)
 	claims := user.Claims.(jwt.MapClaims)
 	userId := claims["user_id"]
-	id := c.Param("likeId")
-	likeId, _ := strconv.Atoi(id)
+	id := c.Param("postUserId")
+	postUserId, _ := strconv.Atoi(id)
 
-	err := lc.lu.DeleteLike(uint(userId.(float64)), uint(likeId))
+	err := lc.lu.DeleteLike(uint(userId.(float64)), uint(postUserId))
 
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())

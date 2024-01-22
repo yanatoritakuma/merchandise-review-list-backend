@@ -83,7 +83,7 @@ func NewRouter(
 		TokenLookup: "cookie:token",
 	}))
 	l.POST("", lc.CreateLike)
-	l.DELETE("/:likeId", lc.DeleteLike)
+	l.DELETE("/:postUserId", lc.DeleteLike)
 
 	return e
 }

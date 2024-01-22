@@ -8,7 +8,7 @@ import (
 
 type ILikeUsecase interface {
 	CreateLike(like model.Like) (model.LikeResponse, error)
-	DeleteLike(userId uint, id uint) error
+	DeleteLike(userId uint, postUserId uint) error
 }
 
 type likeUsecase struct {
@@ -40,8 +40,8 @@ func (lu *likeUsecase) CreateLike(like model.Like) (model.LikeResponse, error) {
 	return resLike, nil
 }
 
-func (lu *likeUsecase) DeleteLike(userId uint, id uint) error {
-	if err := lu.lr.DeleteLike(userId, id); err != nil {
+func (lu *likeUsecase) DeleteLike(userId uint, postUserId uint) error {
+	if err := lu.lr.DeleteLike(userId, postUserId); err != nil {
 		return err
 	}
 	return nil
