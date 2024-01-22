@@ -10,7 +10,7 @@ import (
 
 type ILikeRepository interface {
 	CreateLike(like *model.Like) error
-	DeleteLike(userId uint, id uint) error
+	DeleteLike(userId uint, postUserId uint) error
 	GetLikeByPostAndUser(postId uint, userId uint) (*model.Like, error)
 	GetMyLikeCount(userId uint) (int, error)
 	GetMyLikePostIdsByUserId(userId uint, page int, pageSize int) ([]uint, error)
@@ -31,8 +31,8 @@ func (lr *likeRepository) CreateLike(like *model.Like) error {
 	return nil
 }
 
-func (lr *likeRepository) DeleteLike(userId uint, id uint) error {
-	result := lr.db.Where("user_id=? AND id=?", userId, id).Delete(&model.Like{})
+func (lr *likeRepository) DeleteLike(userId uint, postUserId uint) error {
+	result := lr.db.Where("user_id=? AND post_user_id=?", userId, postUserId).Delete(&model.Like{})
 	if result.Error != nil {
 		return result.Error
 	}

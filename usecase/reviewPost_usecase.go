@@ -104,9 +104,12 @@ func (ru *reviewPostUsecase) GetMyReviewPosts(userId uint, page int, pageSize in
 
 		likeCount := uint(len(likes))
 		likeId := uint(0)
+		likePostUserId := uint(0)
+
 		for _, like := range likes {
 			if like.UserId == userId {
 				likeId = uint(like.ID)
+				likePostUserId = uint(like.PostUserId)
 			}
 		}
 
@@ -123,9 +126,10 @@ func (ru *reviewPostUsecase) GetMyReviewPosts(userId uint, page int, pageSize in
 				Name:  v.User.Name,
 				Image: v.User.Image,
 			},
-			UserId:    v.UserId,
-			LikeCount: likeCount,
-			LikeId:    likeId,
+			UserId:         v.UserId,
+			LikeCount:      likeCount,
+			LikeId:         likeId,
+			LikePostUserId: likePostUserId,
 		}
 		resReviewPosts = append(resReviewPosts, r)
 	}
