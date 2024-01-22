@@ -10,6 +10,7 @@ type Like struct {
 	PostId     uint       `json:"post_id" gorm:"not null"`
 	User       User       `json:"user" gorm:"foreignKey:UserId; constraint:OnDelete:CASCADE"`
 	UserId     uint       `json:"user_id" gorm:"not null"`
+	PostUserId uint       `json:"post_user_id" gorm:"not null"`
 }
 
 type LikeResponse struct {
