@@ -28,7 +28,7 @@ type ReviewPostResponse struct {
 	LikeCount      uint                   `json:"like_count"`
 	LikeId         uint                   `json:"like_id"`
 	LikePostUserId uint                   `json:"like_post_user_id" gorm:"not null"`
-	// CommentCount uint             `json:"commentCount"`
+	CommentCount   uint                   `json:"comment_count"`
 }
 
 type ReviewPostUserResponse struct {

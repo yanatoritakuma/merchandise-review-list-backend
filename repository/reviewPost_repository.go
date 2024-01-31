@@ -17,6 +17,7 @@ type IReviewPostRepository interface {
 	GetUserById(id uint) (*model.User, error)
 	GetReviewPostLists(reviewPost *[]model.ReviewPost, category string, page int, pageSize int) (int, error)
 	GetLikesByPostId(likes *[]model.Like, postId uint) error
+	GetCommentsByPostId(comments *[]model.Comment, postId uint) error
 }
 
 type reviewPostRepository struct {
@@ -125,4 +126,8 @@ func (rr *reviewPostRepository) GetReviewPostLists(reviewPost *[]model.ReviewPos
 
 func (rr *reviewPostRepository) GetLikesByPostId(likes *[]model.Like, postId uint) error {
 	return rr.db.Where("post_id=?", postId).Find(likes).Error
+}
+
+func (rr *reviewPostRepository) GetCommentsByPostId(comments *[]model.Comment, postId uint) error {
+	return rr.db.Where("post_id=?", postId).Find(comments).Error
 }

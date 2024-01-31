@@ -192,6 +192,14 @@ func (ru *reviewPostUsecase) GetReviewPostLists(category string, page int, pageS
 			}
 		}
 
+		comments := []model.Comment{}
+		err = ru.rr.GetCommentsByPostId(&comments, v.ID)
+		if err != nil {
+			return nil, 0, err
+		}
+
+		commentCount := uint(len(comments))
+
 		r := model.ReviewPostResponse{
 			ID:        v.ID,
 			Title:     v.Title,
@@ -205,9 +213,10 @@ func (ru *reviewPostUsecase) GetReviewPostLists(category string, page int, pageS
 				Name:  user.Name,
 				Image: user.Image,
 			},
-			UserId:    v.UserId,
-			LikeCount: likeCount,
-			LikeId:    likeId,
+			UserId:       v.UserId,
+			LikeCount:    likeCount,
+			LikeId:       likeId,
+			CommentCount: commentCount,
 		}
 
 		resReviewPosts = append(resReviewPosts, r)
