@@ -14,6 +14,15 @@ type Comment struct {
 }
 
 type CommentResponse struct {
-	ID     uint `json:"id"`
-	UserId uint `json:"user_id" gorm:"not null"`
+	ID        uint        `json:"id"`
+	Text      string      `json:"text" gorm:"not null"`
+	User      CommentUser `json:"comment_user"`
+	UserId    uint        `json:"user_id" gorm:"not null"`
+	CreatedAt time.Time   `json:"created_at"`
+}
+
+type CommentUser struct {
+	ID    uint   `json:"id" gorm:"primaryKey"`
+	Name  string `json:"name"`
+	Image string `json:"image"`
 }

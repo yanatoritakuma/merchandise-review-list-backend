@@ -31,7 +31,7 @@ func main() {
 
 	commentValidator := validator.NewCommentValidator()
 	commentRepository := repository.NewCommentRepository(db)
-	commentUsecase := usecase.NewCommentUsecase(commentRepository, commentValidator)
+	commentUsecase := usecase.NewCommentUsecase(commentRepository, commentValidator, reviewPostRepository)
 	commentController := controller.NewCommentController(commentUsecase)
 
 	e := router.NewRouter(userController, productController, reviewPostController, likeController, commentController)

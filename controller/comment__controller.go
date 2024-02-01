@@ -4,6 +4,7 @@ import (
 	"merchandise-review-list-backend/model"
 	"merchandise-review-list-backend/usecase"
 	"net/http"
+	"strconv"
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
@@ -11,6 +12,7 @@ import (
 
 type ICommentController interface {
 	CreateComment(c echo.Context) error
+	GetCommentsByPostId(c echo.Context) error
 }
 
 type commentController struct {
@@ -38,4 +40,22 @@ func (cc *commentController) CreateComment(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusCreated, commentRes)
+}
+
+func (cc *commentController) GetCommentsByPostId(c echo.Context) error {
+	page, _ := strconv.Atoi(c.QueryParam("page"))
+	pageSize, _ := strconv.Atoi(c.QueryParam("pageSize"))
+	postId, _ := strconv.Atoi(c.QueryParam("postId"))
+
+	commentsRes, totalPageCount, err := cc.cu.GetCommentsByPostId(uint(postId), page, pageSize)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	response := map[string]interface{}{
+		"totalPageCount": totalPageCount,
+		"commentsRes":    commentsRes,
+	}
+
+	return c.JSON(http.StatusOK, response)
 }

@@ -94,5 +94,8 @@ func NewRouter(
 	}))
 	c.POST("", cc.CreateComment)
 
+	// JWTが必須でないエンドポイント
+	e.GET("/comment", cc.GetCommentsByPostId)
+
 	return e
 }
