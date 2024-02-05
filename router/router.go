@@ -16,6 +16,7 @@ func NewRouter(
 	pc controller.IProductController,
 	rc controller.IReviewPostController,
 	lc controller.ILikeController,
+	cc controller.ICommentController,
 ) *echo.Echo {
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
@@ -84,6 +85,18 @@ func NewRouter(
 	}))
 	l.POST("", lc.CreateLike)
 	l.DELETE("/:postUserId", lc.DeleteLike)
+
+	c := e.Group("/comment")
+	// JWTが必須なエンドポイント
+	c.Use(echojwt.WithConfig(echojwt.Config{
+		SigningKey:  []byte(os.Getenv("SECRET")),
+		TokenLookup: "cookie:token",
+	}))
+	c.POST("", cc.CreateComment)
+	c.DELETE("/:id", cc.DeleteComment)
+
+	// JWTが必須でないエンドポイント
+	e.GET("/comment", cc.GetCommentsByPostId)
 
 	return e
 }
