@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"merchandise-review-list-backend/model"
 
 	"gorm.io/gorm"
@@ -8,6 +9,7 @@ import (
 
 type ICommentRepository interface {
 	CreateComment(comment *model.Comment) error
+	DeleteComment(userId uint, id uint) error
 	GetCommentsByPostId(comments *[]model.Comment, postId uint, page int, pageSize int) (int, error)
 }
 
@@ -22,6 +24,17 @@ func NewCommentRepository(db *gorm.DB) ICommentRepository {
 func (cr *commentRepository) CreateComment(comment *model.Comment) error {
 	if err := cr.db.Create(comment).Error; err != nil {
 		return err
+	}
+	return nil
+}
+
+func (cr *commentRepository) DeleteComment(userId uint, id uint) error {
+	result := cr.db.Where("user_id=? AND id=?", userId, id).Delete(&model.Comment{})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected < 1 {
+		return fmt.Errorf("object does not exist")
 	}
 	return nil
 }

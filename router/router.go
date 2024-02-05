@@ -93,6 +93,7 @@ func NewRouter(
 		TokenLookup: "cookie:token",
 	}))
 	c.POST("", cc.CreateComment)
+	c.DELETE("/:id", cc.DeleteComment)
 
 	// JWTが必須でないエンドポイント
 	e.GET("/comment", cc.GetCommentsByPostId)

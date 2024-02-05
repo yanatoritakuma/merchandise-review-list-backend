@@ -12,6 +12,7 @@ import (
 
 type ICommentController interface {
 	CreateComment(c echo.Context) error
+	DeleteComment(c echo.Context) error
 	GetCommentsByPostId(c echo.Context) error
 }
 
@@ -40,6 +41,21 @@ func (cc *commentController) CreateComment(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusCreated, commentRes)
+}
+
+func (cc *commentController) DeleteComment(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userId := claims["user_id"]
+	id := c.Param("id")
+	commentId, _ := strconv.Atoi(id)
+
+	err := cc.cu.DeleteComment(uint(userId.(float64)), uint(commentId))
+
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.NoContent(http.StatusNoContent)
 }
 
 func (cc *commentController) GetCommentsByPostId(c echo.Context) error {

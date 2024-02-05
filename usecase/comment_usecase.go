@@ -8,6 +8,7 @@ import (
 
 type ICommentUsecase interface {
 	CreateComment(comment model.Comment) (model.CommentResponse, error)
+	DeleteComment(userId uint, id uint) error
 	GetCommentsByPostId(postId uint, page int, pageSize int) ([]model.CommentResponse, int, error)
 }
 
@@ -35,6 +36,13 @@ func (cu *commentUsecase) CreateComment(comment model.Comment) (model.CommentRes
 		UserId: comment.UserId,
 	}
 	return resComment, nil
+}
+
+func (cu *commentUsecase) DeleteComment(userId uint, id uint) error {
+	if err := cu.cr.DeleteComment(userId, id); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (cu *commentUsecase) GetCommentsByPostId(postId uint, page int, pageSize int) ([]model.CommentResponse, int, error) {
