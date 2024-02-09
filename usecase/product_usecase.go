@@ -32,6 +32,7 @@ func (pu *productUsecase) CreateProduct(product model.Product) (model.ProductRes
 		Review:      product.Review,
 		Url:         product.Url,
 		Image:       product.Image,
+		Provider:    product.Provider,
 		CreatedAt:   product.CreatedAt,
 	}
 	return resProduct, nil
@@ -64,6 +65,7 @@ func (pu *productUsecase) GetMyProducts(userId uint, page int, pageSize int) ([]
 			Review:      product.Review,
 			Url:         product.Url,
 			Image:       product.Image,
+			Provider:    product.Provider,
 			CreatedAt:   product.CreatedAt,
 		}
 		resProducts = append(resProducts, p)
