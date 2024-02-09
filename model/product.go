@@ -12,6 +12,7 @@ type Product struct {
 	Url         string    `json:"url" gorm:"not null"`
 	Image       string    `json:"image" gorm:"not null"`
 	Code        string    `json:"code" gorm:"not null"`
+	Provider    string    `json:"provider" gorm:"not null"`
 	User        User      `json:"user" gorm:"foreignKey:UserId; constraint:OnDelete:CASCADE"`
 	UserId      uint      `json:"user_id" gorm:"not null"`
 	CreatedAt   time.Time `gorm:"default:CURRENT_TIMESTAMP"`
@@ -26,5 +27,6 @@ type ProductResponse struct {
 	Review      float64   `json:"review" gorm:"not null"`
 	Url         string    `json:"url" gorm:"not null"`
 	Image       string    `json:"image" gorm:"not null"`
+	Provider    string    `json:"provider" gorm:"not null"`
 	CreatedAt   time.Time `gorm:"default:CURRENT_TIMESTAMP"`
 }
