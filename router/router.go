@@ -60,6 +60,7 @@ func NewRouter(
 	// JWTが必須なエンドポイント
 	p.POST("", pc.CreateProduct)
 	p.GET("/userProducts", pc.GetMyProducts)
+	p.GET("/timeLimit", pc.GetMyProductsTimeLimit)
 	p.DELETE("/:productId", pc.DeleteProduct)
 
 	r := e.Group("/reviewPosts")

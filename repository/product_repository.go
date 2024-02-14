@@ -3,6 +3,7 @@ package repository
 import (
 	"fmt"
 	"merchandise-review-list-backend/model"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -11,6 +12,7 @@ type IProductRepository interface {
 	CreateProduct(product *model.Product) error
 	DeleteProduct(userId uint, productId uint) error
 	GetMyProducts(product *[]model.Product, userId uint, page int, pageSize int) (int, error)
+	GetMyProductsTimeLimit(product *[]model.Product, userId uint, page int, pageSize int) (int, error)
 }
 
 type productRepository struct {
@@ -50,5 +52,23 @@ func (pr *productRepository) GetMyProducts(product *[]model.Product, userId uint
 	if err := pr.db.Joins("User").Where("user_id=?", userId).Order("created_at DESC").Offset(offset).Limit(pageSize).Find(product).Error; err != nil {
 		return 0, err
 	}
+	return int(totalCount), nil
+}
+
+func (pr *productRepository) GetMyProductsTimeLimit(product *[]model.Product, userId uint, page int, pageSize int) (int, error) {
+	offset := (page - 1) * pageSize
+	var totalCount int64
+
+	timeLimit := time.Now().Add(3 * 24 * time.Hour)
+	minimumTime := time.Date(1990, 1, 1, 0, 0, 0, 0, time.UTC)
+
+	if err := pr.db.Model(&model.Product{}).Where("user_id=? AND time_limit <= ? AND time_limit >= ?", userId, timeLimit, minimumTime).Count(&totalCount).Error; err != nil {
+		return 0, err
+	}
+
+	if err := pr.db.Where("user_id=? AND time_limit <= ? AND time_limit >= ?", userId, timeLimit, minimumTime).Order("created_at DESC").Offset(offset).Limit(pageSize).Find(product).Error; err != nil {
+		return 0, err
+	}
+
 	return int(totalCount), nil
 }

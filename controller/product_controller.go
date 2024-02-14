@@ -14,6 +14,7 @@ type IProductController interface {
 	CreateProduct(c echo.Context) error
 	DeleteProduct(c echo.Context) error
 	GetMyProducts(c echo.Context) error
+	GetMyProductsTimeLimit(c echo.Context) error
 }
 
 type productController struct {
@@ -74,4 +75,24 @@ func (pc *productController) GetMyProducts(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, response)
 
+}
+
+func (pc *productController) GetMyProductsTimeLimit(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userId := claims["user_id"]
+	page, _ := strconv.Atoi(c.QueryParam("page"))
+	pageSize, _ := strconv.Atoi(c.QueryParam("pageSize"))
+
+	productsTimeLimitRes, totalPageCount, err := pc.pu.GetMyProductsTimeLimit(uint(userId.(float64)), page, pageSize)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	response := map[string]interface{}{
+		"totalPageCount":    totalPageCount,
+		"productsTimeLimit": productsTimeLimitRes,
+	}
+
+	return c.JSON(http.StatusOK, response)
 }
