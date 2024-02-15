@@ -6,10 +6,12 @@ import (
 	"time"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type IProductRepository interface {
 	CreateProduct(product *model.Product) error
+	UpdateTimeLimit(product *model.Product, userId uint, productId uint) error
 	DeleteProduct(userId uint, productId uint) error
 	GetMyProducts(product *[]model.Product, userId uint, page int, pageSize int) (int, error)
 	GetMyProductsTimeLimit(product *[]model.Product, userId uint, page int, pageSize int) (int, error)
@@ -26,6 +28,19 @@ func NewProductRepository(db *gorm.DB) IProductRepository {
 func (pr *productRepository) CreateProduct(product *model.Product) error {
 	if err := pr.db.Create(product).Error; err != nil {
 		return err
+	}
+	return nil
+}
+
+func (pr *productRepository) UpdateTimeLimit(product *model.Product, userId uint, productId uint) error {
+	result := pr.db.Model(product).Clauses(clause.Returning{}).Where("id=? AND user_id=?", productId, userId).Updates(map[string]interface{}{
+		"time_limit": product.TimeLimit,
+	})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected < 1 {
+		return fmt.Errorf("object does not exist")
 	}
 	return nil
 }

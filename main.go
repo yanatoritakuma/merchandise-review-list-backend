@@ -16,8 +16,9 @@ func main() {
 	userUsecase := usecase.NweUserUsecase(userRepository, userValidator)
 	userController := controller.NewUserController(userUsecase)
 
+	productValidator := validator.NewProductValidator()
 	productRepository := repository.NewProductRepository(db)
-	productUsecase := usecase.NweProductUsecase(productRepository)
+	productUsecase := usecase.NweProductUsecase(productRepository, productValidator)
 	productController := controller.NewProductController(productUsecase)
 
 	likeRepositor := repository.NewLikeRepository(db)

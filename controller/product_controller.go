@@ -12,6 +12,7 @@ import (
 
 type IProductController interface {
 	CreateProduct(c echo.Context) error
+	UpdateTimeLimit(c echo.Context) error
 	DeleteProduct(c echo.Context) error
 	GetMyProducts(c echo.Context) error
 	GetMyProductsTimeLimit(c echo.Context) error
@@ -36,6 +37,25 @@ func (pc *productController) CreateProduct(c echo.Context) error {
 	}
 	product.UserId = uint(userId.(float64))
 	productRes, err := pc.pu.CreateProduct(product)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusCreated, productRes)
+}
+
+func (pc *productController) UpdateTimeLimit(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userId := claims["user_id"]
+	id := c.Param("productId")
+	productId, _ := strconv.Atoi(id)
+
+	product := model.Product{}
+	if err := c.Bind(&product); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	productRes, err := pc.pu.UpdateTimeLimit(product, uint(userId.(float64)), uint(productId))
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}

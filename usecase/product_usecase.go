@@ -3,10 +3,12 @@ package usecase
 import (
 	"merchandise-review-list-backend/model"
 	"merchandise-review-list-backend/repository"
+	"merchandise-review-list-backend/validator"
 )
 
 type IProductUsecase interface {
 	CreateProduct(product model.Product) (model.ProductResponse, error)
+	UpdateTimeLimit(product model.Product, userId uint, productId uint) (model.ProductResponse, error)
 	DeleteProduct(userId uint, productId uint) error
 	GetMyProducts(userId uint, page int, pageSize int) ([]model.ProductResponse, int, error)
 	GetMyProductsTimeLimit(userId uint, page int, pageSize int) ([]model.ProductResponse, int, error)
@@ -14,10 +16,11 @@ type IProductUsecase interface {
 
 type productUsecase struct {
 	pr repository.IProductRepository
+	pv validator.IProductValidator
 }
 
-func NweProductUsecase(pr repository.IProductRepository) IProductUsecase {
-	return &productUsecase{pr}
+func NweProductUsecase(pr repository.IProductRepository, pv validator.IProductValidator) IProductUsecase {
+	return &productUsecase{pr, pv}
 }
 
 func (pu *productUsecase) CreateProduct(product model.Product) (model.ProductResponse, error) {
@@ -37,6 +40,20 @@ func (pu *productUsecase) CreateProduct(product model.Product) (model.ProductRes
 		Provider:    product.Provider,
 		TimeLimit:   product.TimeLimit,
 		CreatedAt:   product.CreatedAt,
+	}
+	return resProduct, nil
+}
+
+func (pu *productUsecase) UpdateTimeLimit(product model.Product, userId uint, productId uint) (model.ProductResponse, error) {
+	if err := pu.pv.ProductValidator(product); err != nil {
+		return model.ProductResponse{}, err
+	}
+	if err := pu.pr.UpdateTimeLimit(&product, userId, productId); err != nil {
+		return model.ProductResponse{}, err
+	}
+
+	resProduct := model.ProductResponse{
+		TimeLimit: product.TimeLimit,
 	}
 	return resProduct, nil
 }
