@@ -110,8 +110,8 @@ func (pc *productController) GetMyProductsTimeLimit(c echo.Context) error {
 	}
 
 	response := map[string]interface{}{
-		"totalPageCount":    totalPageCount,
-		"productsTimeLimit": productsTimeLimitRes,
+		"totalPageCount": totalPageCount,
+		"products":       productsTimeLimitRes,
 	}
 
 	return c.JSON(http.StatusOK, response)
