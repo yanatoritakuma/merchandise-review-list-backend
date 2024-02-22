@@ -4,6 +4,7 @@ import (
 	"merchandise-review-list-backend/model"
 	"merchandise-review-list-backend/repository"
 	"merchandise-review-list-backend/validator"
+	"time"
 )
 
 type IProductUsecase interface {
@@ -11,7 +12,8 @@ type IProductUsecase interface {
 	UpdateTimeLimit(product model.Product, userId uint, productId uint) (model.ProductResponse, error)
 	DeleteProduct(userId uint, productId uint) error
 	GetMyProducts(userId uint, page int, pageSize int) ([]model.ProductResponse, int, error)
-	GetMyProductsTimeLimit(userId uint, page int, pageSize int) ([]model.ProductResponse, int, error)
+	GetMyProductsTimeLimitAll(userId uint, page int, pageSize int) ([]model.ProductResponse, int, error)
+	GetMyProductsTimeLimitYearMonth(userId uint, yearMonth time.Time) ([]model.ProductYearMonthResponse, error)
 }
 
 type productUsecase struct {
@@ -95,10 +97,10 @@ func (pu *productUsecase) GetMyProducts(userId uint, page int, pageSize int) ([]
 	return resProducts, totalCount, nil
 }
 
-func (pu *productUsecase) GetMyProductsTimeLimit(userId uint, page int, pageSize int) ([]model.ProductResponse, int, error) {
+func (pu *productUsecase) GetMyProductsTimeLimitAll(userId uint, page int, pageSize int) ([]model.ProductResponse, int, error) {
 	product := []model.Product{}
 
-	totalCount, err := pu.pr.GetMyProductsTimeLimit(&product, userId, page, pageSize)
+	totalCount, err := pu.pr.GetMyProductsTimeLimitAll(&product, userId, page, pageSize)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -123,4 +125,24 @@ func (pu *productUsecase) GetMyProductsTimeLimit(userId uint, page int, pageSize
 	}
 
 	return resProducts, totalCount, nil
+}
+
+func (pu *productUsecase) GetMyProductsTimeLimitYearMonth(userId uint, yearMonth time.Time) ([]model.ProductYearMonthResponse, error) {
+	product := []model.Product{}
+
+	err := pu.pr.GetMyProductsTimeLimitYearMonth(&product, userId, yearMonth)
+	if err != nil {
+		return nil, err
+	}
+
+	resProducts := []model.ProductYearMonthResponse{}
+	for _, product := range product {
+
+		p := model.ProductYearMonthResponse{
+			TimeLimit: product.TimeLimit,
+		}
+		resProducts = append(resProducts, p)
+	}
+
+	return resProducts, nil
 }

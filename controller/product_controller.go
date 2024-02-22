@@ -5,6 +5,7 @@ import (
 	"merchandise-review-list-backend/usecase"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
@@ -15,7 +16,8 @@ type IProductController interface {
 	UpdateTimeLimit(c echo.Context) error
 	DeleteProduct(c echo.Context) error
 	GetMyProducts(c echo.Context) error
-	GetMyProductsTimeLimit(c echo.Context) error
+	GetMyProductsTimeLimitAll(c echo.Context) error
+	GetMyProductsTimeLimitYearMonth(c echo.Context) error
 }
 
 type productController struct {
@@ -97,14 +99,14 @@ func (pc *productController) GetMyProducts(c echo.Context) error {
 
 }
 
-func (pc *productController) GetMyProductsTimeLimit(c echo.Context) error {
+func (pc *productController) GetMyProductsTimeLimitAll(c echo.Context) error {
 	user := c.Get("user").(*jwt.Token)
 	claims := user.Claims.(jwt.MapClaims)
 	userId := claims["user_id"]
 	page, _ := strconv.Atoi(c.QueryParam("page"))
 	pageSize, _ := strconv.Atoi(c.QueryParam("pageSize"))
 
-	productsTimeLimitRes, totalPageCount, err := pc.pu.GetMyProductsTimeLimit(uint(userId.(float64)), page, pageSize)
+	productsTimeLimitRes, totalPageCount, err := pc.pu.GetMyProductsTimeLimitAll(uint(userId.(float64)), page, pageSize)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -112,6 +114,33 @@ func (pc *productController) GetMyProductsTimeLimit(c echo.Context) error {
 	response := map[string]interface{}{
 		"totalPageCount": totalPageCount,
 		"products":       productsTimeLimitRes,
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func (pc *productController) GetMyProductsTimeLimitYearMonth(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userId := claims["user_id"]
+	yearMonth, err := strconv.Atoi(c.QueryParam("yearMonth"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "Invalid yearMonth format")
+	}
+
+	// yearMonthをtime.Timeに変換する
+	year := yearMonth / 100  // 年を取得
+	month := yearMonth % 100 // 月を取得
+
+	yearMonthTime := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
+
+	productsTimeLimitRes, err := pc.pu.GetMyProductsTimeLimitYearMonth(uint(userId.(float64)), yearMonthTime)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	response := map[string]interface{}{
+		"productNumbers": productsTimeLimitRes,
 	}
 
 	return c.JSON(http.StatusOK, response)

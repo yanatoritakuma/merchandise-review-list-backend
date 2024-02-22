@@ -14,7 +14,8 @@ type IProductRepository interface {
 	UpdateTimeLimit(product *model.Product, userId uint, productId uint) error
 	DeleteProduct(userId uint, productId uint) error
 	GetMyProducts(product *[]model.Product, userId uint, page int, pageSize int) (int, error)
-	GetMyProductsTimeLimit(product *[]model.Product, userId uint, page int, pageSize int) (int, error)
+	GetMyProductsTimeLimitAll(product *[]model.Product, userId uint, page int, pageSize int) (int, error)
+	GetMyProductsTimeLimitYearMonth(product *[]model.Product, userId uint, yearMonth time.Time) error
 }
 
 type productRepository struct {
@@ -70,7 +71,7 @@ func (pr *productRepository) GetMyProducts(product *[]model.Product, userId uint
 	return int(totalCount), nil
 }
 
-func (pr *productRepository) GetMyProductsTimeLimit(product *[]model.Product, userId uint, page int, pageSize int) (int, error) {
+func (pr *productRepository) GetMyProductsTimeLimitAll(product *[]model.Product, userId uint, page int, pageSize int) (int, error) {
 	offset := (page - 1) * pageSize
 	var totalCount int64
 
@@ -86,4 +87,21 @@ func (pr *productRepository) GetMyProductsTimeLimit(product *[]model.Product, us
 	}
 
 	return int(totalCount), nil
+}
+
+func (pr *productRepository) GetMyProductsTimeLimitYearMonth(product *[]model.Product, userId uint, yearMonth time.Time) error {
+
+	startOfMonth := yearMonth.UTC()
+	endOfMonth := startOfMonth.AddDate(0, 1, 0).Add(-time.Second)
+
+	// 年月が一致しているものを取得（同じ日にちは、統一している）
+	if err := pr.db.Table("products").
+		Select("DISTINCT ON (DATE_TRUNC('day', time_limit)) *").
+		Where("user_id = ? AND time_limit >= ? AND time_limit < ?", userId, startOfMonth, endOfMonth).
+		Order("DATE_TRUNC('day', time_limit), created_at DESC").
+		Find(product).Error; err != nil {
+		return err
+	}
+
+	return nil
 }

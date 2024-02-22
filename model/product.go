@@ -32,3 +32,7 @@ type ProductResponse struct {
 	TimeLimit   time.Time `json:"timeLimit" gorm:"not null"`
 	CreatedAt   time.Time `gorm:"default:CURRENT_TIMESTAMP"`
 }
+
+type ProductYearMonthResponse struct {
+	TimeLimit time.Time `json:"timeLimit" gorm:"not null"`
+}
