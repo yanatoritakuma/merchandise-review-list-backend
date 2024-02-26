@@ -16,6 +16,7 @@ type IProductRepository interface {
 	GetMyProducts(product *[]model.Product, userId uint, page int, pageSize int) (int, error)
 	GetMyProductsTimeLimitAll(product *[]model.Product, userId uint, page int, pageSize int) (int, error)
 	GetMyProductsTimeLimitYearMonth(product *[]model.Product, userId uint, yearMonth time.Time) error
+	GetMyProductsTimeLimitDate(product *[]model.Product, userId uint, page int, pageSize int, date time.Time) (int, error)
 }
 
 type productRepository struct {
@@ -104,4 +105,21 @@ func (pr *productRepository) GetMyProductsTimeLimitYearMonth(product *[]model.Pr
 	}
 
 	return nil
+}
+
+func (pr *productRepository) GetMyProductsTimeLimitDate(product *[]model.Product, userId uint, page int, pageSize int, date time.Time) (int, error) {
+	offset := (page - 1) * pageSize
+	var totalCount int64
+
+	date = time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, time.UTC)
+
+	if err := pr.db.Model(&model.Product{}).Where("user_id=? AND DATE(time_limit)=?", userId, date).Count(&totalCount).Error; err != nil {
+		return 0, err
+	}
+
+	if err := pr.db.Where("user_id=? AND DATE(time_limit)=?", userId, date).Order("created_at DESC").Offset(offset).Limit(pageSize).Find(product).Error; err != nil {
+		return 0, err
+	}
+
+	return int(totalCount), nil
 }

@@ -18,6 +18,7 @@ type IProductController interface {
 	GetMyProducts(c echo.Context) error
 	GetMyProductsTimeLimitAll(c echo.Context) error
 	GetMyProductsTimeLimitYearMonth(c echo.Context) error
+	GetMyProductsTimeLimitDate(c echo.Context) error
 }
 
 type productController struct {
@@ -141,6 +142,37 @@ func (pc *productController) GetMyProductsTimeLimitYearMonth(c echo.Context) err
 
 	response := map[string]interface{}{
 		"productNumbers": productsTimeLimitRes,
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func (pc *productController) GetMyProductsTimeLimitDate(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userId := claims["user_id"]
+	page, _ := strconv.Atoi(c.QueryParam("page"))
+	pageSize, _ := strconv.Atoi(c.QueryParam("pageSize"))
+	date, err := strconv.Atoi(c.QueryParam("date"))
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "Invalid date format")
+	}
+
+	year := date / 10000          // 年を取得
+	month := (date % 10000) / 100 // 月を取得
+	day := date % 100             // 日を取得
+
+	dateTime := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
+
+	productsTimeLimitRes, totalPageCount, err := pc.pu.GetMyProductsTimeLimitDate(uint(userId.(float64)), page, pageSize, dateTime)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	response := map[string]interface{}{
+		"totalPageCount": totalPageCount,
+		"products":       productsTimeLimitRes,
 	}
 
 	return c.JSON(http.StatusOK, response)

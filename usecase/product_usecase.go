@@ -14,6 +14,7 @@ type IProductUsecase interface {
 	GetMyProducts(userId uint, page int, pageSize int) ([]model.ProductResponse, int, error)
 	GetMyProductsTimeLimitAll(userId uint, page int, pageSize int) ([]model.ProductResponse, int, error)
 	GetMyProductsTimeLimitYearMonth(userId uint, yearMonth time.Time) ([]model.ProductYearMonthResponse, error)
+	GetMyProductsTimeLimitDate(userId uint, page int, pageSize int, date time.Time) ([]model.ProductResponse, int, error)
 }
 
 type productUsecase struct {
@@ -145,4 +146,34 @@ func (pu *productUsecase) GetMyProductsTimeLimitYearMonth(userId uint, yearMonth
 	}
 
 	return resProducts, nil
+}
+
+func (pu *productUsecase) GetMyProductsTimeLimitDate(userId uint, page int, pageSize int, date time.Time) ([]model.ProductResponse, int, error) {
+	product := []model.Product{}
+
+	totalCount, err := pu.pr.GetMyProductsTimeLimitDate(&product, userId, page, pageSize, date)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	resProducts := []model.ProductResponse{}
+	for _, product := range product {
+
+		p := model.ProductResponse{
+			ID:          product.ID,
+			Name:        product.Name,
+			Description: product.Description,
+			Stock:       product.Stock,
+			Price:       product.Price,
+			Review:      product.Review,
+			Url:         product.Url,
+			Image:       product.Image,
+			Provider:    product.Provider,
+			TimeLimit:   product.TimeLimit,
+			CreatedAt:   product.CreatedAt,
+		}
+		resProducts = append(resProducts, p)
+	}
+
+	return resProducts, totalCount, nil
 }
