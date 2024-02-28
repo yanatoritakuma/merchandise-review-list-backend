@@ -12,7 +12,7 @@ type IProductUsecase interface {
 	UpdateTimeLimit(product model.Product, userId uint, productId uint) (model.ProductResponse, error)
 	DeleteProduct(userId uint, productId uint) error
 	GetMyProducts(userId uint, page int, pageSize int) ([]model.ProductResponse, int, error)
-	GetMyProductsTimeLimitAll(userId uint, page int, pageSize int) ([]model.ProductResponse, int, error)
+	GetMyProductsTimeLimitAll(userId uint, page int, pageSize int, sort bool) ([]model.ProductResponse, int, error)
 	GetMyProductsTimeLimitYearMonth(userId uint, yearMonth time.Time) ([]model.ProductYearMonthResponse, error)
 	GetMyProductsTimeLimitDate(userId uint, page int, pageSize int, date time.Time) ([]model.ProductResponse, int, error)
 }
@@ -98,10 +98,10 @@ func (pu *productUsecase) GetMyProducts(userId uint, page int, pageSize int) ([]
 	return resProducts, totalCount, nil
 }
 
-func (pu *productUsecase) GetMyProductsTimeLimitAll(userId uint, page int, pageSize int) ([]model.ProductResponse, int, error) {
+func (pu *productUsecase) GetMyProductsTimeLimitAll(userId uint, page int, pageSize int, sort bool) ([]model.ProductResponse, int, error) {
 	product := []model.Product{}
 
-	totalCount, err := pu.pr.GetMyProductsTimeLimitAll(&product, userId, page, pageSize)
+	totalCount, err := pu.pr.GetMyProductsTimeLimitAll(&product, userId, page, pageSize, sort)
 	if err != nil {
 		return nil, 0, err
 	}

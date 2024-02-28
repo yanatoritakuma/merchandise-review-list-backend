@@ -106,8 +106,14 @@ func (pc *productController) GetMyProductsTimeLimitAll(c echo.Context) error {
 	userId := claims["user_id"]
 	page, _ := strconv.Atoi(c.QueryParam("page"))
 	pageSize, _ := strconv.Atoi(c.QueryParam("pageSize"))
+	// sortパラメータを文字列として受け取り、それをboolに変換
+	sortParam := c.QueryParam("sort")
+	sort := false
+	if sortParam == "true" {
+		sort = true
+	}
 
-	productsTimeLimitRes, totalPageCount, err := pc.pu.GetMyProductsTimeLimitAll(uint(userId.(float64)), page, pageSize)
+	productsTimeLimitRes, totalPageCount, err := pc.pu.GetMyProductsTimeLimitAll(uint(userId.(float64)), page, pageSize, sort)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}

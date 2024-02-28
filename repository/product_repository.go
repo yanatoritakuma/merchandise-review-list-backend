@@ -14,7 +14,7 @@ type IProductRepository interface {
 	UpdateTimeLimit(product *model.Product, userId uint, productId uint) error
 	DeleteProduct(userId uint, productId uint) error
 	GetMyProducts(product *[]model.Product, userId uint, page int, pageSize int) (int, error)
-	GetMyProductsTimeLimitAll(product *[]model.Product, userId uint, page int, pageSize int) (int, error)
+	GetMyProductsTimeLimitAll(product *[]model.Product, userId uint, page int, pageSize int, sort bool) (int, error)
 	GetMyProductsTimeLimitYearMonth(product *[]model.Product, userId uint, yearMonth time.Time) error
 	GetMyProductsTimeLimitDate(product *[]model.Product, userId uint, page int, pageSize int, date time.Time) (int, error)
 }
@@ -72,18 +72,25 @@ func (pr *productRepository) GetMyProducts(product *[]model.Product, userId uint
 	return int(totalCount), nil
 }
 
-func (pr *productRepository) GetMyProductsTimeLimitAll(product *[]model.Product, userId uint, page int, pageSize int) (int, error) {
+func (pr *productRepository) GetMyProductsTimeLimitAll(product *[]model.Product, userId uint, page int, pageSize int, sort bool) (int, error) {
 	offset := (page - 1) * pageSize
 	var totalCount int64
 
-	timeLimit := time.Now().Add(3 * 24 * time.Hour)
 	minimumTime := time.Date(1990, 1, 1, 0, 0, 0, 0, time.UTC)
 
-	if err := pr.db.Model(&model.Product{}).Where("user_id=? AND time_limit <= ? AND time_limit >= ?", userId, timeLimit, minimumTime).Count(&totalCount).Error; err != nil {
+	if err := pr.db.Model(&model.Product{}).Where("user_id=? AND time_limit >= ?", userId, minimumTime).Count(&totalCount).Error; err != nil {
 		return 0, err
 	}
 
-	if err := pr.db.Where("user_id=? AND time_limit <= ? AND time_limit >= ?", userId, timeLimit, minimumTime).Order("created_at DESC").Offset(offset).Limit(pageSize).Find(product).Error; err != nil {
+	query := pr.db.Where("user_id=? AND time_limit >= ?", userId, minimumTime)
+
+	if sort {
+		query = query.Order("time_limit ASC")
+	} else {
+		query = query.Order("time_limit DESC")
+	}
+
+	if err := query.Offset(offset).Limit(pageSize).Find(product).Error; err != nil {
 		return 0, err
 	}
 
