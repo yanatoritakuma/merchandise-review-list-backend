@@ -79,6 +79,9 @@ func (pu *productUsecase) GetMyProducts(userId uint, page int, pageSize int) ([]
 	resProducts := []model.ProductResponse{}
 	for _, product := range product {
 
+		// product.TimeLimitをJSTに変換
+		jstTimeLimit := product.TimeLimit.In(time.FixedZone("Asia/Tokyo", 0))
+
 		p := model.ProductResponse{
 			ID:          product.ID,
 			Name:        product.Name,
@@ -89,7 +92,7 @@ func (pu *productUsecase) GetMyProducts(userId uint, page int, pageSize int) ([]
 			Url:         product.Url,
 			Image:       product.Image,
 			Provider:    product.Provider,
-			TimeLimit:   product.TimeLimit,
+			TimeLimit:   jstTimeLimit,
 			CreatedAt:   product.CreatedAt,
 		}
 		resProducts = append(resProducts, p)
@@ -109,6 +112,9 @@ func (pu *productUsecase) GetMyProductsTimeLimitAll(userId uint, page int, pageS
 	resProducts := []model.ProductResponse{}
 	for _, product := range product {
 
+		// product.TimeLimitをJSTに変換
+		jstTimeLimit := product.TimeLimit.In(time.FixedZone("Asia/Tokyo", 0))
+
 		p := model.ProductResponse{
 			ID:          product.ID,
 			Name:        product.Name,
@@ -119,7 +125,7 @@ func (pu *productUsecase) GetMyProductsTimeLimitAll(userId uint, page int, pageS
 			Url:         product.Url,
 			Image:       product.Image,
 			Provider:    product.Provider,
-			TimeLimit:   product.TimeLimit,
+			TimeLimit:   jstTimeLimit,
 			CreatedAt:   product.CreatedAt,
 		}
 		resProducts = append(resProducts, p)
@@ -139,8 +145,11 @@ func (pu *productUsecase) GetMyProductsTimeLimitYearMonth(userId uint, yearMonth
 	resProducts := []model.ProductYearMonthResponse{}
 	for _, product := range product {
 
+		// product.TimeLimitをJSTに変換
+		jstTimeLimit := product.TimeLimit.In(time.FixedZone("Asia/Tokyo", 0))
+
 		p := model.ProductYearMonthResponse{
-			TimeLimit: product.TimeLimit,
+			TimeLimit: jstTimeLimit,
 		}
 		resProducts = append(resProducts, p)
 	}
@@ -159,6 +168,9 @@ func (pu *productUsecase) GetMyProductsTimeLimitDate(userId uint, page int, page
 	resProducts := []model.ProductResponse{}
 	for _, product := range product {
 
+		// product.TimeLimitをJSTに変換
+		jstTimeLimit := product.TimeLimit.In(time.FixedZone("Asia/Tokyo", 0))
+
 		p := model.ProductResponse{
 			ID:          product.ID,
 			Name:        product.Name,
@@ -169,7 +181,7 @@ func (pu *productUsecase) GetMyProductsTimeLimitDate(userId uint, page int, page
 			Url:         product.Url,
 			Image:       product.Image,
 			Provider:    product.Provider,
-			TimeLimit:   product.TimeLimit,
+			TimeLimit:   jstTimeLimit,
 			CreatedAt:   product.CreatedAt,
 		}
 		resProducts = append(resProducts, p)

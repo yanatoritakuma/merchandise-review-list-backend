@@ -35,6 +35,9 @@ func (pr *productRepository) CreateProduct(product *model.Product) error {
 }
 
 func (pr *productRepository) UpdateTimeLimit(product *model.Product, userId uint, productId uint) error {
+	// 1日後に更新
+	product.TimeLimit = product.TimeLimit.Add(24 * time.Hour)
+
 	result := pr.db.Model(product).Clauses(clause.Returning{}).Where("id=? AND user_id=?", productId, userId).Updates(map[string]interface{}{
 		"time_limit": product.TimeLimit,
 	})
