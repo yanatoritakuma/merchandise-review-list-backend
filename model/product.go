@@ -13,6 +13,7 @@ type Product struct {
 	Image       string    `json:"image" gorm:"not null"`
 	Code        string    `json:"code" gorm:"not null"`
 	Provider    string    `json:"provider" gorm:"not null"`
+	TimeLimit   time.Time `json:"timeLimit" gorm:"not null"`
 	User        User      `json:"user" gorm:"foreignKey:UserId; constraint:OnDelete:CASCADE"`
 	UserId      uint      `json:"user_id" gorm:"not null"`
 	CreatedAt   time.Time `gorm:"default:CURRENT_TIMESTAMP"`
@@ -28,5 +29,10 @@ type ProductResponse struct {
 	Url         string    `json:"url" gorm:"not null"`
 	Image       string    `json:"image" gorm:"not null"`
 	Provider    string    `json:"provider" gorm:"not null"`
+	TimeLimit   time.Time `json:"timeLimit" gorm:"not null"`
 	CreatedAt   time.Time `gorm:"default:CURRENT_TIMESTAMP"`
+}
+
+type ProductYearMonthResponse struct {
+	TimeLimit time.Time `json:"timeLimit" gorm:"not null"`
 }

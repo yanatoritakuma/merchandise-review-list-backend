@@ -5,6 +5,7 @@ import (
 	"merchandise-review-list-backend/usecase"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/labstack/echo/v4"
@@ -12,8 +13,12 @@ import (
 
 type IProductController interface {
 	CreateProduct(c echo.Context) error
+	UpdateTimeLimit(c echo.Context) error
 	DeleteProduct(c echo.Context) error
 	GetMyProducts(c echo.Context) error
+	GetMyProductsTimeLimitAll(c echo.Context) error
+	GetMyProductsTimeLimitYearMonth(c echo.Context) error
+	GetMyProductsTimeLimitDate(c echo.Context) error
 }
 
 type productController struct {
@@ -35,6 +40,25 @@ func (pc *productController) CreateProduct(c echo.Context) error {
 	}
 	product.UserId = uint(userId.(float64))
 	productRes, err := pc.pu.CreateProduct(product)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusCreated, productRes)
+}
+
+func (pc *productController) UpdateTimeLimit(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userId := claims["user_id"]
+	id := c.Param("productId")
+	productId, _ := strconv.Atoi(id)
+
+	product := model.Product{}
+	if err := c.Bind(&product); err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	productRes, err := pc.pu.UpdateTimeLimit(product, uint(userId.(float64)), uint(productId))
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -74,4 +98,88 @@ func (pc *productController) GetMyProducts(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, response)
 
+}
+
+func (pc *productController) GetMyProductsTimeLimitAll(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userId := claims["user_id"]
+	page, _ := strconv.Atoi(c.QueryParam("page"))
+	pageSize, _ := strconv.Atoi(c.QueryParam("pageSize"))
+	// sortパラメータを文字列として受け取り、それをboolに変換
+	sortParam := c.QueryParam("sort")
+	sort := false
+	if sortParam == "true" {
+		sort = true
+	}
+
+	productsTimeLimitRes, totalPageCount, err := pc.pu.GetMyProductsTimeLimitAll(uint(userId.(float64)), page, pageSize, sort)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	response := map[string]interface{}{
+		"totalPageCount": totalPageCount,
+		"products":       productsTimeLimitRes,
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func (pc *productController) GetMyProductsTimeLimitYearMonth(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userId := claims["user_id"]
+	yearMonth, err := strconv.Atoi(c.QueryParam("yearMonth"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "Invalid yearMonth format")
+	}
+
+	// yearMonthをtime.Timeに変換する
+	year := yearMonth / 100  // 年を取得
+	month := yearMonth % 100 // 月を取得
+
+	yearMonthTime := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
+
+	productsTimeLimitRes, err := pc.pu.GetMyProductsTimeLimitYearMonth(uint(userId.(float64)), yearMonthTime)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	response := map[string]interface{}{
+		"productNumbers": productsTimeLimitRes,
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+func (pc *productController) GetMyProductsTimeLimitDate(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userId := claims["user_id"]
+	page, _ := strconv.Atoi(c.QueryParam("page"))
+	pageSize, _ := strconv.Atoi(c.QueryParam("pageSize"))
+	date, err := strconv.Atoi(c.QueryParam("date"))
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "Invalid date format")
+	}
+
+	year := date / 10000          // 年を取得
+	month := (date % 10000) / 100 // 月を取得
+	day := date % 100             // 日を取得
+
+	dateTime := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
+
+	productsTimeLimitRes, totalPageCount, err := pc.pu.GetMyProductsTimeLimitDate(uint(userId.(float64)), page, pageSize, dateTime)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	response := map[string]interface{}{
+		"totalPageCount": totalPageCount,
+		"products":       productsTimeLimitRes,
+	}
+
+	return c.JSON(http.StatusOK, response)
 }
