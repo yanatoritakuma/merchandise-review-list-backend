@@ -23,6 +23,7 @@ type MoneyManagementResponse struct {
 	Quantity   uint      `json:"quantity"`
 	TotalPrice uint      `json:"total_price"`
 	CreatedAt  time.Time `json:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at"`
 }
 
 type MoneyManagementByCategoryResponse struct {

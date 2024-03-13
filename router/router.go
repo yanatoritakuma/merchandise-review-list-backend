@@ -110,6 +110,7 @@ func NewRouter(
 		TokenLookup: "cookie:token",
 	}))
 	m.POST("", mc.CreateMoneyManagement)
+	m.GET("", mc.GetMyMoneyManagements)
 
 	return e
 }
