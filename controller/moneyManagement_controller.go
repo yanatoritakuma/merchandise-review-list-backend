@@ -49,6 +49,10 @@ func (mc *moneyManagementController) GetMyMoneyManagements(c echo.Context) error
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, "Invalid yearMonth format")
 	}
+	yearFlag, err := strconv.ParseBool(c.QueryParam("yearFlag"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "Invalid yearFlag format")
+	}
 
 	// yearMonthをtime.Timeに変換する
 	year := yearMonth / 100  // 年を取得
@@ -56,14 +60,10 @@ func (mc *moneyManagementController) GetMyMoneyManagements(c echo.Context) error
 
 	yearMonthTime := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.UTC)
 
-	moneyManagementsRes, err := mc.mu.GetMyMoneyManagements(uint(userId.(float64)), yearMonthTime)
+	moneyManagementsRes, err := mc.mu.GetMyMoneyManagements(uint(userId.(float64)), yearMonthTime, yearFlag)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	response := map[string]interface{}{
-		"moneyManagements": moneyManagementsRes,
-	}
-
-	return c.JSON(http.StatusOK, response)
+	return c.JSON(http.StatusOK, moneyManagementsRes)
 }

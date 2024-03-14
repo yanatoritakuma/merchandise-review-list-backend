@@ -36,4 +36,5 @@ type MoneyManagementByCategoryResponse struct {
 	Beauty        []MoneyManagementResponse `json:"beauty"`
 	EveryDayItems []MoneyManagementResponse `json:"everyDayItems"`
 	Other         []MoneyManagementResponse `json:"other"`
+	TotalPrice    uint                      `json:"totalPrice"`
 }
