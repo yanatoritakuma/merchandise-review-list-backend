@@ -49,15 +49,15 @@ func (mu *moneyManagementUsecase) GetMyMoneyManagements(userId uint, yearMonth t
 	}
 
 	res := model.MoneyManagementByCategoryResponse{
-		Food:          []model.MoneyManagementResponse{},
-		Drink:         []model.MoneyManagementResponse{},
-		Book:          []model.MoneyManagementResponse{},
-		Fashion:       []model.MoneyManagementResponse{},
-		Furniture:     []model.MoneyManagementResponse{},
-		GamesToys:     []model.MoneyManagementResponse{},
-		Beauty:        []model.MoneyManagementResponse{},
-		EveryDayItems: []model.MoneyManagementResponse{},
-		Other:         []model.MoneyManagementResponse{},
+		Food:          model.MoneyManagementByCategoryItemResponse{},
+		Drink:         model.MoneyManagementByCategoryItemResponse{},
+		Book:          model.MoneyManagementByCategoryItemResponse{},
+		Fashion:       model.MoneyManagementByCategoryItemResponse{},
+		Furniture:     model.MoneyManagementByCategoryItemResponse{},
+		GamesToys:     model.MoneyManagementByCategoryItemResponse{},
+		Beauty:        model.MoneyManagementByCategoryItemResponse{},
+		EveryDayItems: model.MoneyManagementByCategoryItemResponse{},
+		Other:         model.MoneyManagementByCategoryItemResponse{},
 	}
 
 	totalPrice := uint(0)
@@ -65,7 +65,7 @@ func (mu *moneyManagementUsecase) GetMyMoneyManagements(userId uint, yearMonth t
 	for _, mm := range moneyManagement {
 		switch mm.Category {
 		case "food":
-			res.Food = append(res.Food, model.MoneyManagementResponse{
+			res.Food.Items = append(res.Food.Items, model.MoneyManagementResponse{
 				ID:         mm.ID,
 				Title:      mm.Title,
 				Category:   mm.Category,
@@ -75,9 +75,11 @@ func (mu *moneyManagementUsecase) GetMyMoneyManagements(userId uint, yearMonth t
 				CreatedAt:  mm.CreatedAt,
 				UpdatedAt:  mm.UpdatedAt,
 			})
+
+			res.Food.ItemTotalPrice += mm.TotalPrice
 			totalPrice += mm.TotalPrice
 		case "drink":
-			res.Drink = append(res.Drink, model.MoneyManagementResponse{
+			res.Drink.Items = append(res.Drink.Items, model.MoneyManagementResponse{
 				ID:         mm.ID,
 				Title:      mm.Title,
 				Category:   mm.Category,
@@ -87,9 +89,11 @@ func (mu *moneyManagementUsecase) GetMyMoneyManagements(userId uint, yearMonth t
 				CreatedAt:  mm.CreatedAt,
 				UpdatedAt:  mm.UpdatedAt,
 			})
+
+			res.Drink.ItemTotalPrice += mm.TotalPrice
 			totalPrice += mm.TotalPrice
 		case "book":
-			res.Book = append(res.Book, model.MoneyManagementResponse{
+			res.Book.Items = append(res.Book.Items, model.MoneyManagementResponse{
 				ID:         mm.ID,
 				Title:      mm.Title,
 				Category:   mm.Category,
@@ -99,9 +103,11 @@ func (mu *moneyManagementUsecase) GetMyMoneyManagements(userId uint, yearMonth t
 				CreatedAt:  mm.CreatedAt,
 				UpdatedAt:  mm.UpdatedAt,
 			})
+
+			res.Book.ItemTotalPrice += mm.TotalPrice
 			totalPrice += mm.TotalPrice
 		case "fashion":
-			res.Fashion = append(res.Fashion, model.MoneyManagementResponse{
+			res.Fashion.Items = append(res.Fashion.Items, model.MoneyManagementResponse{
 				ID:         mm.ID,
 				Title:      mm.Title,
 				Category:   mm.Category,
@@ -111,9 +117,11 @@ func (mu *moneyManagementUsecase) GetMyMoneyManagements(userId uint, yearMonth t
 				CreatedAt:  mm.CreatedAt,
 				UpdatedAt:  mm.UpdatedAt,
 			})
+
+			res.Fashion.ItemTotalPrice += mm.TotalPrice
 			totalPrice += mm.TotalPrice
 		case "furniture":
-			res.Furniture = append(res.Furniture, model.MoneyManagementResponse{
+			res.Furniture.Items = append(res.Furniture.Items, model.MoneyManagementResponse{
 				ID:         mm.ID,
 				Title:      mm.Title,
 				Category:   mm.Category,
@@ -123,9 +131,11 @@ func (mu *moneyManagementUsecase) GetMyMoneyManagements(userId uint, yearMonth t
 				CreatedAt:  mm.CreatedAt,
 				UpdatedAt:  mm.UpdatedAt,
 			})
+
+			res.Furniture.ItemTotalPrice += mm.TotalPrice
 			totalPrice += mm.TotalPrice
 		case "gamesToys":
-			res.GamesToys = append(res.GamesToys, model.MoneyManagementResponse{
+			res.GamesToys.Items = append(res.GamesToys.Items, model.MoneyManagementResponse{
 				ID:         mm.ID,
 				Title:      mm.Title,
 				Category:   mm.Category,
@@ -135,9 +145,11 @@ func (mu *moneyManagementUsecase) GetMyMoneyManagements(userId uint, yearMonth t
 				CreatedAt:  mm.CreatedAt,
 				UpdatedAt:  mm.UpdatedAt,
 			})
+
+			res.GamesToys.ItemTotalPrice += mm.TotalPrice
 			totalPrice += mm.TotalPrice
 		case "beauty":
-			res.Beauty = append(res.Beauty, model.MoneyManagementResponse{
+			res.Beauty.Items = append(res.Beauty.Items, model.MoneyManagementResponse{
 				ID:         mm.ID,
 				Title:      mm.Title,
 				Category:   mm.Category,
@@ -147,9 +159,11 @@ func (mu *moneyManagementUsecase) GetMyMoneyManagements(userId uint, yearMonth t
 				CreatedAt:  mm.CreatedAt,
 				UpdatedAt:  mm.UpdatedAt,
 			})
+
+			res.Beauty.ItemTotalPrice += mm.TotalPrice
 			totalPrice += mm.TotalPrice
 		case "everyDayItems":
-			res.EveryDayItems = append(res.EveryDayItems, model.MoneyManagementResponse{
+			res.EveryDayItems.Items = append(res.EveryDayItems.Items, model.MoneyManagementResponse{
 				ID:         mm.ID,
 				Title:      mm.Title,
 				Category:   mm.Category,
@@ -159,9 +173,11 @@ func (mu *moneyManagementUsecase) GetMyMoneyManagements(userId uint, yearMonth t
 				CreatedAt:  mm.CreatedAt,
 				UpdatedAt:  mm.UpdatedAt,
 			})
+
+			res.EveryDayItems.ItemTotalPrice += mm.TotalPrice
 			totalPrice += mm.TotalPrice
 		case "other":
-			res.Other = append(res.Other, model.MoneyManagementResponse{
+			res.Other.Items = append(res.Other.Items, model.MoneyManagementResponse{
 				ID:         mm.ID,
 				Title:      mm.Title,
 				Category:   mm.Category,
@@ -171,6 +187,8 @@ func (mu *moneyManagementUsecase) GetMyMoneyManagements(userId uint, yearMonth t
 				CreatedAt:  mm.CreatedAt,
 				UpdatedAt:  mm.UpdatedAt,
 			})
+
+			res.Other.ItemTotalPrice += mm.TotalPrice
 			totalPrice += mm.TotalPrice
 		}
 

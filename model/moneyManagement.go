@@ -26,15 +26,20 @@ type MoneyManagementResponse struct {
 	UpdatedAt  time.Time `json:"updated_at"`
 }
 
+type MoneyManagementByCategoryItemResponse struct {
+	Items          []MoneyManagementResponse `json:"items"`
+	ItemTotalPrice uint                      `json:"itemTotalPrice"`
+}
+
 type MoneyManagementByCategoryResponse struct {
-	Food          []MoneyManagementResponse `json:"food"`
-	Drink         []MoneyManagementResponse `json:"drink"`
-	Book          []MoneyManagementResponse `json:"book"`
-	Fashion       []MoneyManagementResponse `json:"fashion"`
-	Furniture     []MoneyManagementResponse `json:"furniture"`
-	GamesToys     []MoneyManagementResponse `json:"gamesToys"`
-	Beauty        []MoneyManagementResponse `json:"beauty"`
-	EveryDayItems []MoneyManagementResponse `json:"everyDayItems"`
-	Other         []MoneyManagementResponse `json:"other"`
-	TotalPrice    uint                      `json:"totalPrice"`
+	Food          MoneyManagementByCategoryItemResponse `json:"food"`
+	Drink         MoneyManagementByCategoryItemResponse `json:"drink"`
+	Book          MoneyManagementByCategoryItemResponse `json:"book"`
+	Fashion       MoneyManagementByCategoryItemResponse `json:"fashion"`
+	Furniture     MoneyManagementByCategoryItemResponse `json:"furniture"`
+	GamesToys     MoneyManagementByCategoryItemResponse `json:"gamesToys"`
+	Beauty        MoneyManagementByCategoryItemResponse `json:"beauty"`
+	EveryDayItems MoneyManagementByCategoryItemResponse `json:"everyDayItems"`
+	Other         MoneyManagementByCategoryItemResponse `json:"other"`
+	TotalPrice    uint                                  `json:"totalPrice"`
 }
