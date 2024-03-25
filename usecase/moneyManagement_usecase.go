@@ -3,6 +3,7 @@ package usecase
 import (
 	"merchandise-review-list-backend/model"
 	"merchandise-review-list-backend/repository"
+	"merchandise-review-list-backend/validator"
 	"time"
 )
 
@@ -13,16 +14,20 @@ type IMoneyManagementUsecase interface {
 
 type moneyManagementUsecase struct {
 	mr repository.IMoneyManagementRepository
+	mv validator.IMoneyManagementValidator
 }
 
 func NewMoneyManagementUsecase(
 	mr repository.IMoneyManagementRepository,
+	mv validator.IMoneyManagementValidator,
 ) IMoneyManagementUsecase {
-	return &moneyManagementUsecase{mr}
+	return &moneyManagementUsecase{mr, mv}
 }
 
 func (mu *moneyManagementUsecase) CreateMoneyManagement(moneyManagement model.MoneyManagement) (model.MoneyManagementResponse, error) {
-	// todo:バリデーション未実装
+	if err := mu.mv.MoneyManagementValidator(moneyManagement); err != nil {
+		return model.MoneyManagementResponse{}, err
+	}
 
 	if err := mu.mr.CreateMoneyManagement(&moneyManagement); err != nil {
 		return model.MoneyManagementResponse{}, err

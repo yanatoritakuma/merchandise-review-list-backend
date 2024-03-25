@@ -36,7 +36,8 @@ func main() {
 	commentController := controller.NewCommentController(commentUsecase)
 
 	moneyManagementRepository := repository.NewMoneyManagementRepository(db)
-	moneyManagementUsecase := usecase.NewMoneyManagementUsecase(moneyManagementRepository)
+	moneyManagementValidator := validator.NewMoneyManagementValidator()
+	moneyManagementUsecase := usecase.NewMoneyManagementUsecase(moneyManagementRepository, moneyManagementValidator)
 	moneyManagementController := controller.NewMoneyManagementController(moneyManagementUsecase)
 
 	e := router.NewRouter(userController, productController, reviewPostController, likeController, commentController, moneyManagementController)
