@@ -111,6 +111,7 @@ func NewRouter(
 	}))
 	m.POST("", mc.CreateMoneyManagement)
 	m.GET("", mc.GetMyMoneyManagements)
+	m.PUT("/:id", mc.UpdateMoneyManagement)
 
 	return e
 }

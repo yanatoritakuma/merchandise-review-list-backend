@@ -237,7 +237,11 @@ func (ru *reviewPostUsecase) GetMyLikes(userId uint, page int, pageSize int) ([]
 		return nil, 0, err
 	}
 
-	postIds, err := ru.lr.GetMyLikePostIdsByUserId(userId, page, pageSize)
+	postIds, errGetMyLike := ru.lr.GetMyLikePostIdsByUserId(userId, page, pageSize)
+	if errGetMyLike != nil {
+		return nil, 0, err
+	}
+
 	resLikePosts := []model.ReviewPostResponse{}
 
 	for _, v := range postIds {

@@ -1,14 +1,17 @@
 package repository
 
 import (
+	"fmt"
 	"merchandise-review-list-backend/model"
 	"time"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type IMoneyManagementRepository interface {
 	CreateMoneyManagement(moneyManagement *model.MoneyManagement) error
+	UpdateMoneyManagement(moneyManagement *model.MoneyManagement, userId uint, id uint) error
 	GetMyMoneyManagements(moneyManagement *[]model.MoneyManagement, userId uint, yearMonth time.Time, yearFlag bool) error
 }
 
@@ -23,6 +26,24 @@ func NewMoneyManagementRepository(db *gorm.DB) IMoneyManagementRepository {
 func (mr *moneyManagementRepository) CreateMoneyManagement(moneyManagement *model.MoneyManagement) error {
 	if err := mr.db.Create(moneyManagement).Error; err != nil {
 		return err
+	}
+	return nil
+}
+
+func (mr *moneyManagementRepository) UpdateMoneyManagement(moneyManagement *model.MoneyManagement, userId uint, id uint) error {
+	result := mr.db.Model(moneyManagement).Clauses(clause.Returning{}).Where("id=? AND user_id=?", id, userId).Updates(map[string]interface{}{
+		"title":       moneyManagement.Title,
+		"category":    moneyManagement.Category,
+		"unit_price":  moneyManagement.UnitPrice,
+		"quantity":    moneyManagement.Quantity,
+		"total_price": moneyManagement.TotalPrice,
+		"updated_at":  moneyManagement.UpdatedAt,
+	})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected < 1 {
+		return fmt.Errorf("object does not exist")
 	}
 	return nil
 }

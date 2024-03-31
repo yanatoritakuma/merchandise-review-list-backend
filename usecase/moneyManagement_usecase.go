@@ -9,6 +9,7 @@ import (
 
 type IMoneyManagementUsecase interface {
 	CreateMoneyManagement(moneyManagement model.MoneyManagement) (model.MoneyManagementResponse, error)
+	UpdateMoneyManagement(moneyManagement model.MoneyManagement, userId uint, id uint) (model.MoneyManagementResponse, error)
 	GetMyMoneyManagements(userId uint, yearMonth time.Time, yearFlag bool) (model.MoneyManagementByCategoryResponse, error)
 }
 
@@ -33,6 +34,27 @@ func (mu *moneyManagementUsecase) CreateMoneyManagement(moneyManagement model.Mo
 		return model.MoneyManagementResponse{}, err
 	}
 
+	resMoneyManagement := model.MoneyManagementResponse{
+		ID:         moneyManagement.ID,
+		Title:      moneyManagement.Title,
+		Category:   moneyManagement.Category,
+		UnitPrice:  moneyManagement.UnitPrice,
+		Quantity:   moneyManagement.Quantity,
+		TotalPrice: moneyManagement.TotalPrice,
+		CreatedAt:  moneyManagement.CreatedAt,
+		UpdatedAt:  moneyManagement.UpdatedAt,
+	}
+	return resMoneyManagement, nil
+}
+
+func (mu *moneyManagementUsecase) UpdateMoneyManagement(moneyManagement model.MoneyManagement, userId uint, id uint) (model.MoneyManagementResponse, error) {
+	if err := mu.mv.MoneyManagementValidator(moneyManagement); err != nil {
+		return model.MoneyManagementResponse{}, err
+	}
+
+	if err := mu.mr.UpdateMoneyManagement(&moneyManagement, userId, id); err != nil {
+		return model.MoneyManagementResponse{}, err
+	}
 	resMoneyManagement := model.MoneyManagementResponse{
 		ID:         moneyManagement.ID,
 		Title:      moneyManagement.Title,
