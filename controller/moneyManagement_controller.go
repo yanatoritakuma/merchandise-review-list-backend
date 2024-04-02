@@ -14,6 +14,7 @@ import (
 type IMoneyManagementController interface {
 	CreateMoneyManagement(c echo.Context) error
 	UpdateMoneyManagement(c echo.Context) error
+	DeleteMoneyManagement(c echo.Context) error
 	GetMyMoneyManagements(c echo.Context) error
 }
 
@@ -61,6 +62,20 @@ func (mc *moneyManagementController) UpdateMoneyManagement(c echo.Context) error
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusCreated, moneyManagementRes)
+}
+
+func (mc *moneyManagementController) DeleteMoneyManagement(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userId := claims["user_id"]
+	id := c.Param("id")
+	managementId, _ := strconv.Atoi(id)
+
+	err := mc.mu.DeleteMoneyManagement(uint(userId.(float64)), uint(managementId))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return c.NoContent(http.StatusNoContent)
 }
 
 func (mc *moneyManagementController) GetMyMoneyManagements(c echo.Context) error {

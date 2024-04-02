@@ -12,6 +12,7 @@ import (
 type IMoneyManagementRepository interface {
 	CreateMoneyManagement(moneyManagement *model.MoneyManagement) error
 	UpdateMoneyManagement(moneyManagement *model.MoneyManagement, userId uint, id uint) error
+	DeleteMoneyManagement(userId uint, id uint) error
 	GetMyMoneyManagements(moneyManagement *[]model.MoneyManagement, userId uint, yearMonth time.Time, yearFlag bool) error
 }
 
@@ -39,6 +40,17 @@ func (mr *moneyManagementRepository) UpdateMoneyManagement(moneyManagement *mode
 		"total_price": moneyManagement.TotalPrice,
 		"updated_at":  moneyManagement.UpdatedAt,
 	})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected < 1 {
+		return fmt.Errorf("object does not exist")
+	}
+	return nil
+}
+
+func (mr *moneyManagementRepository) DeleteMoneyManagement(userId uint, id uint) error {
+	result := mr.db.Where("id=? AND user_id=?", id, userId).Delete(&model.MoneyManagement{})
 	if result.Error != nil {
 		return result.Error
 	}
