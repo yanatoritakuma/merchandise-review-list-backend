@@ -40,6 +40,10 @@ func main() {
 	moneyManagementUsecase := usecase.NewMoneyManagementUsecase(moneyManagementRepository, moneyManagementValidator)
 	moneyManagementController := controller.NewMoneyManagementController(moneyManagementUsecase)
 
-	e := router.NewRouter(userController, productController, reviewPostController, likeController, commentController, moneyManagementController)
+	budgetRepository := repository.NewBudgetRepository(db)
+	budgetUsecase := usecase.NweBudgetUsecase(budgetRepository)
+	budgetController := controller.NewBudgetController(budgetUsecase)
+
+	e := router.NewRouter(userController, productController, reviewPostController, likeController, commentController, moneyManagementController, budgetController)
 	e.Logger.Fatal(e.Start(":8080"))
 }
