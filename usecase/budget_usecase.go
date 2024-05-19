@@ -26,6 +26,7 @@ func (bu *budgetUsecase) CreateProduct(budget model.Budget) (model.BudgetRespons
 		ID:            budget.ID,
 		Month:         budget.Month,
 		Year:          budget.Year,
+		TotalPrice:    budget.TotalPrice,
 		Food:          budget.Food,
 		Drink:         budget.Drink,
 		Book:          budget.Book,

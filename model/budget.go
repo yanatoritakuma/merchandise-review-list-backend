@@ -6,6 +6,7 @@ type Budget struct {
 	ID            uint      `json:"id" gorm:"primaryKey"`
 	Month         string    `json:"month" gorm:"not null"`
 	Year          string    `json:"year" gorm:"not null"`
+	TotalPrice    uint      `json:"total_price" gorm:"not null"`
 	Food          uint      `json:"food" gorm:"not null"`
 	Drink         uint      `json:"drink" gorm:"not null"`
 	Book          uint      `json:"book" gorm:"not null"`
@@ -26,6 +27,7 @@ type BudgetResponse struct {
 	ID            uint      `json:"id"`
 	Month         string    `json:"month"`
 	Year          string    `json:"year"`
+	TotalPrice    uint      `json:"total_price"`
 	Food          uint      `json:"food"`
 	Drink         uint      `json:"drink"`
 	Book          uint      `json:"book"`
