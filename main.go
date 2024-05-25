@@ -41,7 +41,8 @@ func main() {
 	moneyManagementController := controller.NewMoneyManagementController(moneyManagementUsecase)
 
 	budgetRepository := repository.NewBudgetRepository(db)
-	budgetUsecase := usecase.NweBudgetUsecase(budgetRepository)
+	budgetValidator := validator.NewBudgetValidator()
+	budgetUsecase := usecase.NweBudgetUsecase(budgetRepository, budgetValidator)
 	budgetController := controller.NewBudgetController(budgetUsecase)
 
 	e := router.NewRouter(userController, productController, reviewPostController, likeController, commentController, moneyManagementController, budgetController)

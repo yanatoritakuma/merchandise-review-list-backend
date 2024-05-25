@@ -3,6 +3,7 @@ package usecase
 import (
 	"merchandise-review-list-backend/model"
 	"merchandise-review-list-backend/repository"
+	"merchandise-review-list-backend/validator"
 )
 
 type IBudgetUsecase interface {
@@ -11,13 +12,18 @@ type IBudgetUsecase interface {
 
 type budgetUsecase struct {
 	br repository.IBudgetRepository
+	bv validator.IBudgetValidator
 }
 
-func NweBudgetUsecase(pr repository.IBudgetRepository) IBudgetUsecase {
-	return &budgetUsecase{pr}
+func NweBudgetUsecase(br repository.IBudgetRepository, bv validator.IBudgetValidator) IBudgetUsecase {
+	return &budgetUsecase{br, bv}
 }
 
 func (bu *budgetUsecase) CreateProduct(budget model.Budget) (model.BudgetResponse, error) {
+	if err := bu.bv.BudgetValidator(budget); err != nil {
+		return model.BudgetResponse{}, err
+	}
+
 	if err := bu.br.CreateBudget(&budget); err != nil {
 		return model.BudgetResponse{}, err
 	}
