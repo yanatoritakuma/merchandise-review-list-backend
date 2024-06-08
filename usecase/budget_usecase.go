@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"errors"
 	"merchandise-review-list-backend/model"
 	"merchandise-review-list-backend/repository"
 	"merchandise-review-list-backend/validator"
@@ -20,6 +21,16 @@ func NweBudgetUsecase(br repository.IBudgetRepository, bv validator.IBudgetValid
 }
 
 func (bu *budgetUsecase) CreateProduct(budget model.Budget) (model.BudgetResponse, error) {
+	existingBudget, err := bu.br.SameYearMonth(budget.UserId, budget.Year, budget.Month)
+
+	if err != nil {
+		return model.BudgetResponse{}, err
+	}
+
+	if existingBudget != nil {
+		return model.BudgetResponse{}, errors.New("duplicate budget")
+	}
+
 	if err := bu.bv.BudgetValidator(budget); err != nil {
 		return model.BudgetResponse{}, err
 	}
