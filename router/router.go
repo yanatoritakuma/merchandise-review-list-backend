@@ -122,6 +122,7 @@ func NewRouter(
 	}))
 	// JWTが必須なエンドポイント
 	b.POST("", bc.CreateBudget)
+	b.GET("/budgetByUserId", bc.GetBudgetByUserId)
 
 	return e
 }

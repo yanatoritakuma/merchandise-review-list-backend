@@ -11,6 +11,7 @@ import (
 
 type IBudgetController interface {
 	CreateBudget(c echo.Context) error
+	GetBudgetByUserId(c echo.Context) error
 }
 
 type budgetController struct {
@@ -38,4 +39,23 @@ func (bc *budgetController) CreateBudget(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusCreated, budgetRes)
+}
+
+func (bc *budgetController) GetBudgetByUserId(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userId := claims["user_id"]
+	year := c.QueryParam("year")
+	month := c.QueryParam("month")
+
+	budgetRes, err := bc.bu.GetBudgetByUserId(uint(userId.(float64)), year, month)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	response := map[string]interface{}{
+		"budget": budgetRes,
+	}
+
+	return c.JSON(http.StatusOK, response)
 }

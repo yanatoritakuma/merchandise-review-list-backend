@@ -10,6 +10,7 @@ import (
 type IBudgetRepository interface {
 	CreateBudget(budget *model.Budget) error
 	SameYearMonth(userId uint, year string, month string) (*model.Budget, error) //既に設定年月が存在しているか
+	GetBudgetByUserId(budget *model.Budget, userId uint, year string, month string) error
 }
 
 type budgetRepository struct {
@@ -39,4 +40,15 @@ func (br *budgetRepository) SameYearMonth(userId uint, year string, month string
 	}
 
 	return budget, nil
+}
+
+func (br *budgetRepository) GetBudgetByUserId(budget *model.Budget, userId uint, year string, month string) error {
+	if err := br.db.Where("user_id=? AND year=? AND month=?", userId, year, month).First(budget).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil // レコードが見つからない場合はnilを返す
+		}
+
+		return err
+	}
+	return nil
 }
