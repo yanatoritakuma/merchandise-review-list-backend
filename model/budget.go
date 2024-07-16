@@ -14,7 +14,7 @@ type Budget struct {
 	Furniture     uint      `json:"furniture" gorm:"not null"`
 	GamesToys     uint      `json:"games_toys" gorm:"not null"`
 	Beauty        uint      `json:"beauty" gorm:"not null"`
-	EveryDayItems uint      `json:"every_dayItems" gorm:"not null"`
+	EveryDayItems uint      `json:"every_day_items" gorm:"not null"`
 	Other         uint      `json:"other" gorm:"not null"`
 	Notice        bool      `json:"notice" gorm:"not null"`
 	CreatedAt     time.Time `gorm:"default:CURRENT_TIMESTAMP"`
@@ -35,7 +35,7 @@ type BudgetResponse struct {
 	Furniture     uint      `json:"furniture"`
 	GamesToys     uint      `json:"games_toys"`
 	Beauty        uint      `json:"beauty"`
-	EveryDayItems uint      `json:"every_dayItems"`
+	EveryDayItems uint      `json:"every_day_items"`
 	Other         uint      `json:"other"`
 	Notice        bool      `json:"notice"`
 	CreatedAt     time.Time `json:"created_at"`

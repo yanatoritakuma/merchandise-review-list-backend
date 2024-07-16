@@ -9,6 +9,7 @@ import (
 
 type IBudgetUsecase interface {
 	CreateProduct(budget model.Budget) (model.BudgetResponse, error)
+	UpdateBudget(budget model.Budget, userId uint, id uint) (model.BudgetResponse, error)
 	GetBudgetByUserId(userId uint, year string, month string) (model.BudgetResponse, error)
 }
 
@@ -57,6 +58,36 @@ func (bu *budgetUsecase) CreateProduct(budget model.Budget) (model.BudgetRespons
 		Notice:        budget.Notice,
 		CreatedAt:     budget.CreatedAt,
 	}
+	return resBudget, nil
+}
+
+func (bu *budgetUsecase) UpdateBudget(budget model.Budget, userId uint, id uint) (model.BudgetResponse, error) {
+	if err := bu.bv.BudgetValidator(budget); err != nil {
+		return model.BudgetResponse{}, err
+	}
+
+	if err := bu.br.UpdateBudget(&budget, userId, id); err != nil {
+		return model.BudgetResponse{}, err
+	}
+
+	resBudget := model.BudgetResponse{
+		ID:            budget.ID,
+		Month:         budget.Month,
+		Year:          budget.Year,
+		TotalPrice:    budget.TotalPrice,
+		Food:          budget.Food,
+		Drink:         budget.Drink,
+		Book:          budget.Book,
+		Fashion:       budget.Fashion,
+		Furniture:     budget.Furniture,
+		GamesToys:     budget.GamesToys,
+		Beauty:        budget.Beauty,
+		EveryDayItems: budget.EveryDayItems,
+		Other:         budget.Other,
+		Notice:        budget.Notice,
+		CreatedAt:     budget.CreatedAt,
+	}
+
 	return resBudget, nil
 }
 

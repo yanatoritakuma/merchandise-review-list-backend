@@ -2,13 +2,16 @@ package repository
 
 import (
 	"errors"
+	"fmt"
 	"merchandise-review-list-backend/model"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type IBudgetRepository interface {
 	CreateBudget(budget *model.Budget) error
+	UpdateBudget(budget *model.Budget, userId uint, id uint) error
 	SameYearMonth(userId uint, year string, month string) (*model.Budget, error) //既に設定年月が存在しているか
 	GetBudgetByUserId(budget *model.Budget, userId uint, year string, month string) error
 }
@@ -24,6 +27,30 @@ func NewBudgetRepository(db *gorm.DB) IBudgetRepository {
 func (br *budgetRepository) CreateBudget(budget *model.Budget) error {
 	if err := br.db.Create(budget).Error; err != nil {
 		return err
+	}
+	return nil
+}
+
+func (br *budgetRepository) UpdateBudget(budget *model.Budget, userId uint, id uint) error {
+	result := br.db.Model(budget).Clauses(clause.Returning{}).Where("id=? AND user_id=?", id, userId).Updates(map[string]interface{}{
+		"month":           budget.Month,
+		"year":            budget.Year,
+		"total_price":     budget.TotalPrice,
+		"food":            budget.Food,
+		"drink":           budget.Drink,
+		"book":            budget.Book,
+		"fashion":         budget.Fashion,
+		"furniture":       budget.Furniture,
+		"games_toys":      budget.GamesToys,
+		"beauty":          budget.Beauty,
+		"every_day_items": budget.EveryDayItems,
+		"other":           budget.Other,
+	})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected < 1 {
+		return fmt.Errorf("object does not exist")
 	}
 	return nil
 }
