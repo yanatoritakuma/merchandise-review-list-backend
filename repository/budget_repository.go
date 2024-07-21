@@ -70,12 +70,39 @@ func (br *budgetRepository) SameYearMonth(userId uint, year string, month string
 }
 
 func (br *budgetRepository) GetBudgetByUserId(budget *model.Budget, userId uint, year string, month string) error {
-	if err := br.db.Where("user_id=? AND year=? AND month=?", userId, year, month).First(budget).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil // レコードが見つからない場合はnilを返す
+	if month == "all" {
+		var budgets []model.Budget
+		if err := br.db.Where("user_id = ? AND year = ?", userId, year).Find(&budgets).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return nil // レコードが見つからない場合はnilを返す
+			}
+			return err
 		}
 
-		return err
+		// 全てのレコードの各フィールドの合計を計算
+		var totalBudget model.Budget
+		for _, b := range budgets {
+			totalBudget.TotalPrice += b.TotalPrice
+			totalBudget.Food += b.Food
+			totalBudget.Drink += b.Drink
+			totalBudget.Book += b.Book
+			totalBudget.Fashion += b.Fashion
+			totalBudget.Furniture += b.Furniture
+			totalBudget.GamesToys += b.GamesToys
+			totalBudget.Beauty += b.Beauty
+			totalBudget.EveryDayItems += b.EveryDayItems
+			totalBudget.Other += b.Other
+		}
+
+		*budget = totalBudget
+		return nil
+	} else {
+		if err := br.db.Where("user_id = ? AND year = ? AND month = ?", userId, year, month).First(budget).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return nil // レコードが見つからない場合はnilを返す
+			}
+			return err
+		}
+		return nil
 	}
-	return nil
 }
