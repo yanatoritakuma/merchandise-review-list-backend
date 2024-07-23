@@ -1,0 +1,120 @@
+package usecase
+
+import (
+	"errors"
+	"merchandise-review-list-backend/model"
+	"merchandise-review-list-backend/repository"
+	"merchandise-review-list-backend/validator"
+)
+
+type IBudgetUsecase interface {
+	CreateProduct(budget model.Budget) (model.BudgetResponse, error)
+	UpdateBudget(budget model.Budget, userId uint, id uint) (model.BudgetResponse, error)
+	GetBudgetByUserId(userId uint, year string, month string) (model.BudgetResponse, error)
+}
+
+type budgetUsecase struct {
+	br repository.IBudgetRepository
+	bv validator.IBudgetValidator
+}
+
+func NweBudgetUsecase(br repository.IBudgetRepository, bv validator.IBudgetValidator) IBudgetUsecase {
+	return &budgetUsecase{br, bv}
+}
+
+func (bu *budgetUsecase) CreateProduct(budget model.Budget) (model.BudgetResponse, error) {
+	existingBudget, err := bu.br.SameYearMonth(budget.UserId, budget.Year, budget.Month)
+
+	if err != nil {
+		return model.BudgetResponse{}, err
+	}
+
+	if existingBudget != nil {
+		return model.BudgetResponse{}, errors.New("duplicate budget")
+	}
+
+	if err := bu.bv.BudgetValidator(budget); err != nil {
+		return model.BudgetResponse{}, err
+	}
+
+	if err := bu.br.CreateBudget(&budget); err != nil {
+		return model.BudgetResponse{}, err
+	}
+
+	resBudget := model.BudgetResponse{
+		ID:            budget.ID,
+		Month:         budget.Month,
+		Year:          budget.Year,
+		TotalPrice:    budget.TotalPrice,
+		Food:          budget.Food,
+		Drink:         budget.Drink,
+		Book:          budget.Book,
+		Fashion:       budget.Fashion,
+		Furniture:     budget.Furniture,
+		GamesToys:     budget.GamesToys,
+		Beauty:        budget.Beauty,
+		EveryDayItems: budget.EveryDayItems,
+		Other:         budget.Other,
+		Notice:        budget.Notice,
+		CreatedAt:     budget.CreatedAt,
+	}
+	return resBudget, nil
+}
+
+func (bu *budgetUsecase) UpdateBudget(budget model.Budget, userId uint, id uint) (model.BudgetResponse, error) {
+	if err := bu.bv.BudgetValidator(budget); err != nil {
+		return model.BudgetResponse{}, err
+	}
+
+	if err := bu.br.UpdateBudget(&budget, userId, id); err != nil {
+		return model.BudgetResponse{}, err
+	}
+
+	resBudget := model.BudgetResponse{
+		ID:            budget.ID,
+		Month:         budget.Month,
+		Year:          budget.Year,
+		TotalPrice:    budget.TotalPrice,
+		Food:          budget.Food,
+		Drink:         budget.Drink,
+		Book:          budget.Book,
+		Fashion:       budget.Fashion,
+		Furniture:     budget.Furniture,
+		GamesToys:     budget.GamesToys,
+		Beauty:        budget.Beauty,
+		EveryDayItems: budget.EveryDayItems,
+		Other:         budget.Other,
+		Notice:        budget.Notice,
+		CreatedAt:     budget.CreatedAt,
+	}
+
+	return resBudget, nil
+}
+
+func (bu *budgetUsecase) GetBudgetByUserId(userId uint, year string, month string) (model.BudgetResponse, error) {
+	budget := model.Budget{}
+	err := bu.br.GetBudgetByUserId(&budget, userId, year, month)
+	if err != nil {
+		return model.BudgetResponse{}, err
+	}
+
+	resBudget := model.BudgetResponse{
+		ID:            budget.ID,
+		Month:         budget.Month,
+		Year:          budget.Year,
+		TotalPrice:    budget.TotalPrice,
+		Food:          budget.Food,
+		Drink:         budget.Drink,
+		Book:          budget.Book,
+		Fashion:       budget.Fashion,
+		Furniture:     budget.Furniture,
+		GamesToys:     budget.GamesToys,
+		Beauty:        budget.Beauty,
+		EveryDayItems: budget.EveryDayItems,
+		Other:         budget.Other,
+		Notice:        budget.Notice,
+		CreatedAt:     budget.CreatedAt,
+	}
+
+	return resBudget, nil
+}
