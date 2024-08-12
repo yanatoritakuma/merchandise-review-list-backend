@@ -10,5 +10,19 @@ func main() {
 	dbConn := db.NewDB()
 	defer fmt.Println("Successfully Migrated")
 	defer db.CloseDB(dbConn)
-	dbConn.AutoMigrate(&model.User{}, &model.Product{}, &model.ReviewPost{}, &model.Like{}, &model.Comment{}, &model.MoneyManagement{}, &model.Budget{})
+	dbConn.AutoMigrate(
+		&model.User{},
+		&model.Product{},
+		&model.ReviewPost{},
+		&model.Like{},
+		&model.Comment{},
+		&model.MoneyManagement{},
+		&model.Budget{},
+		&model.HouseholdBudget{},
+		&model.HouseholdBudgetPayItem{},
+		&model.HouseholdBudgetEstimate{},
+		&model.HouseholdBudgetEstimateItem{},
+		&model.HouseholdBudgetCategory{},
+		&model.HouseholdBudgetShare{},
+	)
 }
