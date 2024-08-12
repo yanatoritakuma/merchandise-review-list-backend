@@ -11,8 +11,9 @@ type HouseholdBudget struct {
 	UpdatedAt time.Time `gorm:"autoUpdateTime"`
 }
 
-type HouseholdBudgetUsecaseResponse struct {
-	ID     uint   `json:"id"`
-	UserId uint   `json:"user_id"`
-	Title  string `json:"title"`
+type HouseholdBudgetResponse struct {
+	ID        uint      `json:"id"`
+	UserId    uint      `json:"user_id"`
+	Title     string    `json:"title"`
+	CreatedAt time.Time `json:"created_at"`
 }

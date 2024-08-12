@@ -133,6 +133,7 @@ func NewRouter(
 	}))
 	// JWTが必須なエンドポイント
 	h.POST("", hc.CreateHouseholdBudget)
+	h.GET("", hc.GetMyHouseholdBudget)
 
 	return e
 }
