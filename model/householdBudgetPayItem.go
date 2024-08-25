@@ -2,6 +2,7 @@ package model
 
 import "time"
 
+// 家計簿支出アイテムテーブル
 type HouseholdBudgetPayItem struct {
 	ID                uint                    `json:"id" gorm:"primaryKey"`
 	User              User                    `json:"user" gorm:"foreignKey:UserId; constraint:OnDelete:CASCADE"`
