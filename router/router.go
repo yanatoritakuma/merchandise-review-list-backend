@@ -143,6 +143,7 @@ func NewRouter(
 	}))
 	// JWTが必須なエンドポイント
 	hei.POST("", heic.CreateHouseholdBudgetEstimateItem)
+	hei.GET("", heic.GetMyHouseholdBudgetEstimateItem)
 
 	return e
 }

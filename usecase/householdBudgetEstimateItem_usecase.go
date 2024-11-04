@@ -7,6 +7,7 @@ import (
 
 type IHouseholdBudgetEstimateItemUsecase interface {
 	CreateHouseholdBudgetEstimateItem(householdBudgetEstimateItem model.HouseholdBudgetEstimateItem) (model.HouseholdBudgetEstimateItemResponse, error)
+	GetMyHouseholdBudgetEstimateItem(householdBudgetId uint, userId uint, year string, month string) ([]model.HouseholdBudgetEstimateItemResponse, error)
 }
 
 type householdBudgetEstimateItemUsecase struct {
@@ -31,4 +32,30 @@ func (hu *householdBudgetEstimateItemUsecase) CreateHouseholdBudgetEstimateItem(
 
 	return resHouseholdBudgetEstimateItem, nil
 
+}
+
+// 特定の家計簿予算の年月日に紐づくアイテムを取得する
+func (hu *householdBudgetEstimateItemUsecase) GetMyHouseholdBudgetEstimateItem(householdBudgetId uint, userId uint, year string, month string) ([]model.HouseholdBudgetEstimateItemResponse, error) {
+	householdBudgetEstimateItem := []model.HouseholdBudgetEstimateItem{}
+	err := hu.hr.GetMyHouseholdBudgetEstimateItem(&householdBudgetEstimateItem, householdBudgetId, userId, year, month)
+	if err != nil {
+		return nil, err
+	}
+
+	resHouseholdBudge := []model.HouseholdBudgetEstimateItemResponse{}
+
+	for _, v := range householdBudgetEstimateItem {
+		h := model.HouseholdBudgetEstimateItemResponse{
+			ID:         v.ID,
+			Name:       v.Name,
+			CategoryId: v.CategoryId,
+			Amount:     v.Amount,
+			FixedCost:  v.FixedCost,
+			CreatedAt:  v.CreatedAt,
+		}
+
+		resHouseholdBudge = append(resHouseholdBudge, h)
+	}
+
+	return resHouseholdBudge, nil
 }

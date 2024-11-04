@@ -20,7 +20,10 @@ type HouseholdBudgetEstimateItem struct {
 }
 
 type HouseholdBudgetEstimateItemResponse struct {
-	ID        uint      `json:"id"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"created_at"`
+	ID         uint      `json:"id"`
+	Name       string    `json:"name"`
+	CategoryId uint      `json:"category_id"`
+	Amount     uint      `json:"amount"`
+	FixedCost  bool      `json:"fixed_cost"`
+	CreatedAt  time.Time `json:"created_at"`
 }
