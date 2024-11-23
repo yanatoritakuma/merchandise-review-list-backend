@@ -26,7 +26,6 @@ func (hu *householdBudgetEstimateItemUsecase) CreateHouseholdBudgetEstimateItem(
 
 	resHouseholdBudgetEstimateItem := model.HouseholdBudgetEstimateItemResponse{
 		ID:        householdBudgetEstimateItem.ID,
-		Name:      householdBudgetEstimateItem.Name,
 		CreatedAt: householdBudgetEstimateItem.CreatedAt,
 	}
 
@@ -47,10 +46,7 @@ func (hu *householdBudgetEstimateItemUsecase) GetMyHouseholdBudgetEstimateItem(h
 	for _, v := range householdBudgetEstimateItem {
 		h := model.HouseholdBudgetEstimateItemResponse{
 			ID:         v.ID,
-			Name:       v.Name,
 			CategoryId: v.CategoryId,
-			Amount:     v.Amount,
-			FixedCost:  v.FixedCost,
 			CreatedAt:  v.CreatedAt,
 		}
 
