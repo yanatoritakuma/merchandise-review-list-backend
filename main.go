@@ -45,6 +45,25 @@ func main() {
 	budgetUsecase := usecase.NweBudgetUsecase(budgetRepository, budgetValidator)
 	budgetController := controller.NewBudgetController(budgetUsecase)
 
-	e := router.NewRouter(userController, productController, reviewPostController, likeController, commentController, moneyManagementController, budgetController)
+	householdBudgetValidator := validator.NewHouseholdBudgetValidator()
+	householdBudgetRepository := repository.NewHouseholdBudgetRepository(db)
+	householdBudgetUsecase := usecase.NweHouseholdBudgetUsecase(householdBudgetRepository, householdBudgetValidator)
+	householdBudgetController := controller.NewHouseholdBudgetController(householdBudgetUsecase)
+
+	householdBudgetEstimateItemRepository := repository.NewHouseholdBudgetEstimateItemRepository(db)
+	householdBudgetEstimateItemUsecase := usecase.NweHouseholdBudgetEstimateItemUsecase(householdBudgetEstimateItemRepository)
+	householdBudgetEstimateItemController := controller.NewHouseholdBudgetEstimateItemController(householdBudgetEstimateItemUsecase)
+
+	e := router.NewRouter(
+		userController,
+		productController,
+		reviewPostController,
+		likeController,
+		commentController,
+		moneyManagementController,
+		budgetController,
+		householdBudgetController,
+		householdBudgetEstimateItemController,
+	)
 	e.Logger.Fatal(e.Start(":8080"))
 }

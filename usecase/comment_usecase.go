@@ -53,7 +53,7 @@ func (cu *commentUsecase) GetCommentsByPostId(postId uint, page int, pageSize in
 		return nil, 0, err
 	}
 
-	resCounts := []model.CommentResponse{}
+	resComments := []model.CommentResponse{}
 
 	for _, v := range comments {
 		user, err := cu.rr.GetUserById(v.UserId)
@@ -72,7 +72,7 @@ func (cu *commentUsecase) GetCommentsByPostId(postId uint, page int, pageSize in
 			UserId:    v.UserId,
 			CreatedAt: v.CreatedAt,
 		}
-		resCounts = append(resCounts, c)
+		resComments = append(resComments, c)
 	}
-	return resCounts, totalCount, nil
+	return resComments, totalCount, nil
 }
